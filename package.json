@@ -1,0 +1,63 @@
+{
+  "name": "demostripe",
+  "private": true,
+  "version": "0.0.0",
+  "description": "a Sails application",
+  "keywords": [],
+  "dependencies": {
+    "@sailshq/connect-redis": "^3.2.1",
+    "@sailshq/lodash": "^3.10.3",
+    "@sailshq/socket.io-redis": "^5.2.0",
+    "aws-sdk": "^2.1267.0",
+    "bcrypt": "^5.1.0",
+    "dotenv": "^16.0.3",
+    "fcm-node": "^1.6.1",
+    "firebase": "^9.13.0",
+    "firebase-admin": "^11.2.0",
+    "fs": "^0.0.1-security",
+    "grunt": "1.0.4",
+    "handlebars": "^4.7.7",
+    "html-inline": "^1.2.0",
+    "html-pdf": "^3.0.1",
+    "jsonwebtoken": "^9.0.0",
+    "lodash": "^4.17.21",
+    "node-deep-links": "^1.0.6",
+    "nodemon": "^2.0.20",
+    "path": "^0.12.7",
+    "pdf-node": "^1.0.0",
+    "pdfkit": "^0.13.0",
+    "puppeteer": "^19.2.2",
+    "quicktype": "^23.0.18",
+    "quicktype-core": "^23.0.18",
+    "sails": "^1.5.3",
+    "sails-hook-cron": "^3.2.0",
+    "sails-hook-grunt": "^5.0.0",
+    "sails-hook-organics": "^2.2.1",
+    "sails-hook-orm": "^4.0.0",
+    "sails-hook-sockets": "^2.0.0",
+    "sails-hook-uploads": "^0.4.3",
+    "sails-mysql": "^3.0.0",
+    "stripe": "^10.15.0",
+    "uuid": "^9.0.0",
+    "validatorjs": "^3.22.1"
+  },
+  "devDependencies": {
+    "eslint": "5.16.0"
+  },
+  "scripts": {
+    "start": "NODE_ENV=production node app.js",
+    "test": "npm run lint && npm run custom-tests && echo 'Done.'",
+    "lint": "./node_modules/eslint/bin/eslint.js . --max-warnings=0 --report-unused-disable-directives && echo '✔  Your .js files look good.'",
+    "custom-tests": "echo \"(No other custom tests yet.)\" && echo"
+  },
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ztlab23/demostripe.git"
+  },
+  "author": "ztlab23",
+  "license": "",
+  "engines": {
+    "node": "^16"
+  }
+}
