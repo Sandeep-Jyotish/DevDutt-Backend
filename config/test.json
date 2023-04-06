@@ -1,55 +1,54 @@
 {
-  "status": "success",
-  "data": [
+  "datacomponentTree": [
     {
-      "id": 1,
-      "employee_name": "Tiger Nixon",
-      "employee_salary": 320800,
-      "employee_age": 61,
-      "profile_image": ""
+      "responseRoot": "jokes",
+      "apiEndPoint": "https://api.chucknorris.io/jokes/random",
+      "auth": "",
+      "restAPIType": "GET",
+      "parameters": "",
+      "formData/body": "",
+      "JSONResponse": {
+        "categories": ["money"],
+        "id": "l7U9EO5rTlyvCc9WIJALtw",
+        "icon_url": "https://assets.chucknorris.host/img/avatar/chuck-norris.png",
+        "url": "https://api.chucknorris.io/jokes/l7U9EO5rTlyvCc9WIJALtw",
+        "value": "Chuck Norris is so money he's accepted at all highstreet retailers."
+      },
+      "dataConnection": [
+        {
+          "componentID": "joke",
+          "javaFXType": "LABEL",
+          "connection": "JSONResponse.value"
+        },
+        {
+          "componentID": "joke_id",
+          "javaFXType": "LABEL",
+          "connection": "JSONResponse.id"
+        }
+      ]
     },
     {
-      "id": 2,
-      "employee_name": "Garrett Winters",
-      "employee_salary": 170750,
-      "employee_age": 63,
-      "profile_image": ""
-    },
-    {
-      "id": 3,
-      "employee_name": "Ashton Cox",
-      "employee_salary": 86000,
-      "employee_age": 66,
-      "profile_image": ""
-    },
-    {
-      "id": 4,
-      "employee_name": "Cedric Kelly",
-      "employee_salary": 433060,
-      "employee_age": 22,
-      "profile_image": ""
-    },
-    {
-      "id": 5,
-      "employee_name": "Airi Satou",
-      "employee_salary": 162700,
-      "employee_age": 33,
-      "profile_image": ""
-    },
-    {
-      "id": 6,
-      "employee_name": "Brielle Williamson",
-      "employee_salary": 372000,
-      "employee_age": 61,
-      "profile_image": ""
-    },
-    {
-      "id": 7,
-      "employee_name": "Herrod Chandler",
-      "employee_salary": 137500,
-      "employee_age": 59,
-      "profile_image": ""
+      "responseRoot": "tempJokes",
+      "apiEndPoint": "https://api.chucknorris.io/jokes/random",
+      "auth": "",
+      "restAPIType": "GET",
+      "parameters": "",
+      "formData/body": "",
+      "JSONResponse": {
+        "categories": ["money"],
+        "id": "l7U9EO5rTlyvCc9WIJALtw",
+        "uuid": "l7U9EO5rTlyvCc9WIJALtw",
+        "icon_url": "https://assets.chucknorris.host/img/avatar/chuck-norris.png",
+        "url": "https://api.chucknorris.io/jokes/l7U9EO5rTlyvCc9WIJALtw",
+        "value": "Chuck Norris is so money he's accepted at all highstreet retailers."
+      },
+      "dataConnection": [
+        {
+          "componentID": "joke_image",
+          "javaFXType": "IMAGE",
+          "connection": "JSONResponse.icon_url"
+        }
+      ]
     }
-  ],
-  "message": "Successfully! All records has been fetched."
+  ]
 }

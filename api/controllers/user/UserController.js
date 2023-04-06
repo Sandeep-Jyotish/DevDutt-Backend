@@ -5,6 +5,7 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 const { ResponseCodes, isEmpty } = sails.config.constants;
+const GetMessages = sails.config.getMessages;
 module.exports = {
   /**
    * @description This method will create a user
@@ -15,11 +16,14 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   create: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
     try {
       //fields to validate
       let field = [
         "firstName",
         "lastName",
+        "picture",
         "email",
         "phoneNo",
         "password",
@@ -37,8 +41,15 @@ module.exports = {
         });
       } else {
         //json destructuring
-        let { firstName, lastName, email, password, confirmPassword, phoneNo } =
-          result.data;
+        let {
+          firstName,
+          lastName,
+          picture,
+          email,
+          password,
+          confirmPassword,
+          phoneNo,
+        } = result.data;
 
         // Find user exists or not for that email
         let checkUser = await User.findOne({
@@ -53,7 +64,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "User already Exists on this Email",
+            message: GetMessages("User.AlreadyExist", lang),
             error: "",
           });
         }
@@ -64,10 +75,13 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Passwords didn't Match",
+            message: GetMessages("User.PasswordMissMatched", lang),
             error: "",
           });
         }
+
+        // // create RazorPay customer Id for the user
+        // await sails.helpers.razorPay.customer.create.with({});
         //generating user ID
         let id = sails.config.constants.UUID();
         //current time
@@ -76,6 +90,7 @@ module.exports = {
           id: id,
           firstName: firstName,
           lastName: lastName,
+          picture: picture,
           phoneNo: phoneNo,
           email: email,
           password: password,
@@ -92,6 +107,7 @@ module.exports = {
         return res.ok({
           status: ResponseCodes.OK,
           data: user,
+          message: GetMessages("User.Created", lang),
           error: "",
         });
       }
@@ -169,7 +185,14 @@ module.exports = {
         //find user on given id
         let user = await User.findOne({ where: { id: id, isDeleted: false } });
         if (user) {
-          let field = ["firstName", "lastName", "email", "phoneNo", "password"];
+          let field = [
+            "firstName",
+            "lastName",
+            "picture",
+            "email",
+            "phoneNo",
+            "password",
+          ];
           // Validate the data
           let result = await User.validateBeforeCreateOrUpdate(req.body, field);
           if (result.hasError) {

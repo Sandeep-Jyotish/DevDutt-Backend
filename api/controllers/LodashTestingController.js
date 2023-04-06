@@ -105,10 +105,19 @@ module.exports = {
             "explicit-unions": "true",
             "acronym-style": "camel",
           },
+
+          InferenceFlags: {
+            inferUuids: false,
+            inferDateTimes: false,
+            inferIntegerStrings: false,
+            inferBooleanStrings: false,
+            inferMaps: false,
+            inferEnums: false,
+          },
         });
       }
       const { lines: javaPerson } = await convert(
-        "java",
+        "swift",
         "success",
         JSON.stringify(file)
       );
@@ -125,6 +134,32 @@ module.exports = {
         data: {},
         // message: "",
         error: error.toString(),
+      });
+    }
+  },
+  map: async function (req, res) {
+    try {
+      const SphericalUtil = require("node-geometry-library");
+      let response = SphericalUtil.SphericalUtil.computeDistanceBetween(
+        { lat: 23.055238445144024, lng: 72.54887355427091 }, //from object {lat, lng}
+        { lat: 23.198095596678552, lng: 72.62318632895979 } // to object {lat, lng}
+      );
+      // var latitude1 = 39.46;
+      // var longitude1 = -0.36;
+      // var latitude2 = 40.4;
+      // var longitude2 = -3.68;
+      // const google = require("google");
+      // var distance = google.maps.geometry.spherical.computeDistanceBetween(
+      //   new google.maps.LatLng(latitude1, longitude1),
+      //   new google.maps.LatLng(latitude2, longitude2)
+      // );
+      return res.json({
+        message: "successful!",
+        data: response / 1000,
+      });
+    } catch (error) {
+      return res.serverError({
+        error: error,
       });
     }
   },

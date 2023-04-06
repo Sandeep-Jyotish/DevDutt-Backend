@@ -5,6 +5,7 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 const { JWT, ResponseCodes } = sails.config.constants;
+const GetMessages = sails.config.getMessages;
 module.exports = {
   /**
    * @description This method will Generate AuthTOken for user and
@@ -16,6 +17,8 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   login: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
     try {
       //get the auth details for login
       let field = ["email", "password"];
@@ -60,7 +63,7 @@ module.exports = {
               },
               process.env.JWT_SECRET,
               {
-                expiresIn: "24h",
+                expiresIn: "2h",
               }
             );
             if (token) {
@@ -70,12 +73,14 @@ module.exports = {
                 authToken: token,
                 lastLoginTime: currentTime,
               });
+              console.log(lang);
 
               //Send Response
               return res.ok({
                 status: ResponseCodes.OK,
                 data: update,
-                message: "Password Matched & You are now Logged In",
+                message: GetMessages("User.LoggedinSuccessfully", lang),
+                // message: "Password Matched & You are now Logged In",
                 error: "",
               });
             } else {
@@ -83,7 +88,7 @@ module.exports = {
               return res.badRequest({
                 status: ResponseCodes.BAD_REQUEST,
                 data: {},
-                message: "Auth Token Could not Generate",
+                message: GetMessages("User.AuthTokenError", lang),
                 error: "",
               });
             }
@@ -92,7 +97,7 @@ module.exports = {
             return res.badRequest({
               status: ResponseCodes.BAD_REQUEST,
               data: {},
-              message: "Password did not Match",
+              message: GetMessages("User.WrongPassword", lang),
               error: "",
             });
           }
@@ -117,12 +122,12 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   logout: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
     try {
-      let userId = req.body.id;
-
       //   Set AuthToken Null as LogOut
       let update = await User.updateOne({
-        id: userId,
+        id: req.me.id,
         isDeleted: false,
       }).set({
         authToken: null,
@@ -133,7 +138,7 @@ module.exports = {
         return res.ok({
           status: ResponseCodes.OK,
           data: {},
-          message: `${update.firstName},You are Successfully Logged Out`,
+          message: `${update.firstName},` + GetMessages("User.LogOut", lang),
           error: "",
         });
       } else {
@@ -141,7 +146,7 @@ module.exports = {
         return res.badRequest({
           status: ResponseCodes.BAD_REQUEST,
           data: {},
-          message: "Error in Log Out",
+          message: GetMessages("User.LogOutError", lang),
           error: "",
         });
       }

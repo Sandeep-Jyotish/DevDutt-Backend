@@ -5,6 +5,7 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 const { ResponseCodes, isEmpty } = sails.config.constants;
+const GetMessages = sails.config.getMessages;
 module.exports = {
   /**
    * @description This method will returns all Bookings details of current user
@@ -15,9 +16,10 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   get: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
     try {
       let { skip, limit } = req.query;
-      console.log(req.me.id);
       let where = { bookingBy: req.me.id, isDeleted: false };
       let queryObj = {
         where: where,
@@ -29,7 +31,7 @@ module.exports = {
       }
 
       // Find All trips
-      let bookings = await Booking.find(queryObj);
+      let bookings = await Booking.find(queryObj).populate("receiverId");
       let count = await Booking.count(where);
       //sending OK response
       return res.ok({
@@ -58,6 +60,8 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   getById: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
     try {
       // get the booking id
       let id = req.params.id;
@@ -67,7 +71,7 @@ module.exports = {
           id: id,
           isDeleted: false,
         },
-      });
+      }).populate("receiverId");
       if (bookingDetails) {
         //sending OK response
         return res.ok({
@@ -80,7 +84,97 @@ module.exports = {
         return res.badRequest({
           status: ResponseCodes.BAD_REQUEST,
           data: {},
-          message: "Booking Not Found",
+          message: GetMessages("Booking.NotFound", lang),
+          error: "",
+        });
+      }
+    } catch (error) {
+      //return error
+      return res.serverError({
+        status: ResponseCodes.SERVER_ERROR,
+        data: {},
+        message: "",
+        error: error.toString(),
+      });
+    }
+  },
+  /**
+   * @description This method will returns all the Booking details according to or suit for the trip id
+   * @method GET
+   * @param {Request} req
+   * @param {Response} res
+   * @returns HTTP Response
+   * @author Sandeep Jyotish (Zignuts)
+   */
+  relatedBookings: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
+    try {
+      // Validate the id of Booking
+      let result = await Trip.validateBeforeCreateOrUpdate(req.body, ["id"]);
+      if (result.hasError) {
+        //if has any error in input field
+        return res.badRequest({
+          status: ResponseCodes.BAD_REQUEST,
+          data: {},
+          message: Object.keys(result.errors).length,
+          error: result.errors,
+        });
+      } else {
+        let { id } = result.data;
+
+        // find the trip details
+        let tripDetails = await Trip.findOne({
+          where: {
+            id: id,
+            tripBy: req.me.id,
+            isDeleted: false,
+          },
+        });
+        if (!tripDetails) {
+          return res.badRequest({
+            status: ResponseCodes.BAD_REQUEST,
+            data: {},
+            message: GetMessages("Trip.NotFound", lang),
+            error: "",
+          });
+        }
+        // find Bookings who has the same destination and timing
+        // Preparing the query object
+        let where = {
+          startingPoint: tripDetails.startingPoint,
+          endingPoint: tripDetails.endingPoint,
+          expStartTime: { ">=": tripDetails.startTime },
+          expEndTime: { "<=": tripDetails.endTime },
+          isBooked: false,
+          isDeleted: false,
+        };
+        if (tripDetails.noOfPerson >= 1) {
+          where.or = [
+            {
+              myself: true,
+            },
+            {
+              myself: false,
+            },
+          ];
+        } else {
+          where.myself = false;
+        }
+        let bookingObj = {
+          where: where,
+          sort: "expStartTime DESC",
+        };
+
+        // find boookings and user
+        let bookings = await Booking.find(bookingObj).populate("bookingBy");
+        let count = await Booking.count(where);
+        //send the response
+        return res.ok({
+          status: ResponseCodes.OK,
+          total: count,
+          data: bookings,
+          message: GetMessages("Booking.RelatedBookings", lang),
           error: "",
         });
       }
@@ -103,9 +197,14 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   create: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
+    let error = "";
+    let code = "";
     try {
       //fields to validate
       let fields = [
+        "myself",
         "item",
         "weightType",
         "weight",
@@ -113,6 +212,7 @@ module.exports = {
         "endingPoint",
         "expStartTime",
         "expEndTime",
+        "details",
       ];
 
       // Validate the data
@@ -130,6 +230,7 @@ module.exports = {
         let currentTime = Math.floor(Date.now() / 1000);
         //json destructuring
         let {
+          myself,
           item,
           weightType,
           weight,
@@ -137,7 +238,30 @@ module.exports = {
           endingPoint,
           expStartTime,
           expEndTime,
+          details,
         } = result.data;
+
+        let receiverData;
+        if (!isEmpty(item)) {
+          //fields to validate of Receiver details
+          let receiverFields = ["firstName", "lastName", "email", "phoneNo"];
+          // Validate the data
+          let receiverResult = await Receiver.validateBeforeCreateOrUpdate(
+            req.body,
+            receiverFields
+          );
+          if (receiverResult.hasError) {
+            //if has any error in input field
+            return res.badRequest({
+              status: ResponseCodes.BAD_REQUEST,
+              data: {},
+              message: Object.keys(receiverResult.errors).length,
+              error: receiverResult.errors,
+            });
+          } else {
+            receiverData = receiverResult.data;
+          }
+        }
 
         // converting time to unix
         let startCnvrt = Date.parse(expStartTime);
@@ -151,7 +275,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Start Time Can not be Past",
+            message: GetMessages("Booking.PastStartTimeError", lang),
             error: "",
           });
         }
@@ -160,21 +284,27 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Start Time Can not be same or greater than AS Reach Time",
+            message: GetMessages("Booking.SameStartAndEndTime", lang),
             error: "",
           });
         }
 
+        //generating IDs
+        let bookingId = sails.config.constants.UUID();
+        let receiverId = sails.config.constants.UUID();
         // set data to store in database
         let dataToStore = {
-          id: sails.config.constants.UUID(),
-          item: item,
-          weightType: weightType,
-          weight: weight,
+          id: bookingId,
+          myself: myself,
+          item: myself == true ? null : item,
+          weightType: myself == true ? null : weightType,
+          weight: myself == true ? null : weight,
           startingPoint: startingPoint,
           endingPoint: endingPoint,
           expStartTime: unixStartTime,
           expEndTime: unixEndTime,
+          details: details,
+          receiverId: myself !== true ? receiverId : null,
           bookingBy: req.me.id,
           createdBy: req.me.id,
           createdAt: currentTime,
@@ -182,9 +312,50 @@ module.exports = {
           updatedBy: req.me.id,
         };
 
-        // creatae the Booking for user
-        let create = await Booking.create(dataToStore).fetch();
-
+        // start the transaction
+        await sails.getDatastore().transaction(async (db) => {
+          // creatae the Booking for user
+          await Booking.create(dataToStore)
+            .usingConnection(db)
+            .catch((err) => {
+              sails.log.error(
+                "Error from Booking controller, while create record in Booking table"
+              );
+              //if database error
+              error = err.toString();
+              code = ResponseCodes.BAD_REQUEST;
+              throw error;
+            });
+          if (myself === false) {
+            let receiverDataToStore = {
+              id: receiverId,
+              firstName: receiverData.firstName,
+              lastName: receiverData.lastName,
+              email: receiverData.email,
+              phoneNo: receiverData.phoneNo,
+              bookingId: bookingId,
+              createdAt: currentTime,
+              createdBy: req.me.id,
+              updatedAt: currentTime,
+              updatedBy: req.me.id,
+            };
+            // create Receiver details
+            await Receiver.create(receiverDataToStore)
+              .usingConnection(db)
+              .catch((err) => {
+                sails.log.error(
+                  "Error from Trip controller, while create record in receiver table"
+                );
+                //if database error
+                error = err.toString();
+                code = ResponseCodes.BAD_REQUEST;
+                throw error;
+              });
+          }
+        });
+        if (!isEmpty(receiverData)) {
+          // send Mail and notification to the receiver to confirm the Booking
+        }
         // find Trips who has the same destination and timing
         // Preparing the query object
         let where = {
@@ -193,6 +364,9 @@ module.exports = {
           endTime: { "<=": unixEndTime },
           isDeleted: false,
         };
+        if (myself) {
+          where.or = [{ noOfPerson: { ">=": 1 } }];
+        }
         let tripObj = {
           where: where,
           sort: "startTime DESC",
@@ -204,22 +378,34 @@ module.exports = {
           // Send notification to the Trip riders about this Booking
           // Also send the Trips details to the user who want Booking
         }
+
         //sending OK response
         return res.ok({
           status: ResponseCodes.OK,
-          data: { trips, create },
-          message: "Booking Created Successfully",
+          data: { trips },
+          message: GetMessages("Booking.Create", lang),
           error: "",
         });
       }
     } catch (error) {
       //return error
-      return res.serverError({
-        status: ResponseCodes.SERVER_ERROR,
-        data: {},
-        message: "",
-        error: error.toString(),
-      });
+      if (code != "") {
+        // return database error
+        return res.badRequest({
+          status: ResponseCodes.BAD_REQUEST,
+          data: {},
+          message: "Database Error",
+          error: error.toString(),
+        });
+      } else {
+        //return server error
+        return res.serverError({
+          status: ResponseCodes.SERVER_ERROR,
+          data: {},
+          message: "",
+          error: error.toString(),
+        });
+      }
     }
   },
   /**
@@ -231,6 +417,8 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   update: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
     try {
       //fields to validate
       let fields = [
@@ -242,6 +430,7 @@ module.exports = {
         "endingPoint",
         "expStartTime",
         "expEndTime",
+        "details",
       ];
       // Validate the data
       let result = await Booking.validateBeforeCreateOrUpdate(req.body, fields);
@@ -266,6 +455,7 @@ module.exports = {
           endingPoint,
           expStartTime,
           expEndTime,
+          details,
         } = result.data;
         // converting time to unix
         let startCnvrt = Date.parse(expStartTime);
@@ -279,7 +469,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Start Time Can not be Past",
+            message: GetMessages("Booking.PastStartTimeError", lang),
             error: "",
           });
         }
@@ -288,7 +478,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Start Time Can not be same or greater than AS Reach Time",
+            message: GetMessages("Booking.SameStartAndEndTime", lang),
             error: "",
           });
         }
@@ -314,6 +504,7 @@ module.exports = {
             endingPoint: endingPoint,
             expStartTime: unixStartTime,
             expEndTime: unixEndTime,
+            details: details,
             updatedAt: currentTime,
             updatedBy: req.me.id,
           };
@@ -347,7 +538,7 @@ module.exports = {
             return res.ok({
               status: ResponseCodes.OK,
               data: { update, trips },
-              message: "Booking Updated Successfully",
+              message: GetMessages("Booking.Update", lang),
               error: "",
             });
           } else {
@@ -355,7 +546,7 @@ module.exports = {
             return res.badRequest({
               status: ResponseCodes.BAD_REQUEST,
               data: {},
-              message: "Booking can not be update",
+              message: GetMessages("Booking.UpdateError", lang),
               error: "",
             });
           }
@@ -364,7 +555,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Booking can not Find for update",
+            message: GetMessages("Booking.NotFound", lang),
             error: "",
           });
         }
@@ -388,6 +579,8 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   advanceFilter: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
     try {
       //get the query data
       let {
@@ -403,6 +596,10 @@ module.exports = {
         isBooked,
         isReached,
       } = req.query;
+
+      //current time
+      let currentTime = Math.floor(Date.now() / 1000);
+
       let selectClause,
         fromClause,
         whereClause,
@@ -411,7 +608,9 @@ module.exports = {
 
       selectClause = `SELECT *`;
       fromClause = `\n FROM test.booking as b`;
-      whereClause = `\n WHERE isDeleted = false`;
+      whereClause = `\n WHERE isDeleted = false
+                        AND b.expStartTime > ${currentTime}
+                      `;
       let nativeCount = `
             SELECT
                   count(*) as cnt
@@ -513,6 +712,8 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   delete: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
     let error = "";
     let code = "";
     try {
@@ -543,7 +744,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Booking Not Found",
+            message: GetMessages("Booking.NotFound", lang),
             error: "",
           });
         }
@@ -562,7 +763,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Your Booking is already approved",
+            message: GetMessages("Booking.AlreadyApproved", lang),
             error: "",
           });
         }

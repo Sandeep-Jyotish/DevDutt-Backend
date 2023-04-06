@@ -25,6 +25,15 @@ module.exports = {
       type: "boolean",
       defaultsTo: false,
     },
+    otp: {
+      type: "number",
+      allowNull: true,
+      columnType: "unit(11)",
+    },
+    isRejected: {
+      type: "boolean",
+      defaultsTo: false,
+    },
     // Associations start
     // Association with trip table
     tripId: {

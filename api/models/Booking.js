@@ -15,22 +15,27 @@ module.exports = {
       unique: true,
       columnType: "varchar(40)",
     },
+    myself: {
+      type: "boolean",
+      defaultsTo: false,
+    },
     item: {
       type: "string",
-      required: true,
+      allowNull: true,
       columnType: "varchar(128)",
     },
     weightType: {
       type: "string",
       columnType: "enum",
-      required: true,
+      allowNull: true,
       isIn: ["G", "KG"],
     },
     weight: {
       type: "number",
-      required: true,
+      allowNull: true,
       columnType: "BigInt(20)",
     },
+
     startingPoint: {
       type: "string",
       required: true,
@@ -51,6 +56,11 @@ module.exports = {
       allowNull: true,
       columnType: "unit(11)",
     },
+    details: {
+      type: "string",
+      allowNull: true,
+      columnType: "varchar(300)",
+    },
     // status: {
     //   type: "string",
     //   columnType: "enum",
@@ -60,6 +70,19 @@ module.exports = {
     isBooked: {
       type: "boolean",
       defaultsTo: false,
+    },
+    isReceiverReady: {
+      type: "boolean",
+      defaultsTo: false,
+    },
+    hasPickedUp: {
+      type: "boolean",
+      defaultsTo: false,
+    },
+    pickupTime: {
+      type: "number",
+      allowNull: true,
+      columnType: "unit(11)",
     },
     isReached: {
       type: "boolean",
@@ -73,6 +96,10 @@ module.exports = {
     // Association with user table
     bookingBy: {
       model: "User",
+    },
+    // Association with receiver table
+    receiverId: {
+      model: "Receiver",
     },
     // Association with PickRequest table
     pickRequestId: {

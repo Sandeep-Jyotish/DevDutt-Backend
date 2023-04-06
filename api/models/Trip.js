@@ -51,6 +51,10 @@ module.exports = {
       required: true,
       columnType: "float",
     },
+    noOfPerson: {
+      type: "number",
+      allowNull: true,
+    },
     details: {
       type: "string",
       allowNull: true,

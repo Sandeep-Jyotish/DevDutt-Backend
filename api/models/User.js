@@ -25,10 +25,20 @@ module.exports = {
       allowNull: true,
       columnType: "varchar(128)",
     },
+    picture: {
+      type: "string",
+      allowNull: true,
+      columnType: "varchar(128)",
+    },
     email: {
       type: "string",
       required: true,
       columnType: "varchar(128)",
+    },
+    phoneNo: {
+      type: "string",
+      allowNull: true,
+      columnType: "varchar(20)",
     },
     password: {
       type: "string",

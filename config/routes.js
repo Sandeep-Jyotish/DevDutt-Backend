@@ -45,8 +45,10 @@ module.exports.routes = {
   "POST /lodash/testing/pick": "LodashTestingController.pickTest",
   "POST /lodash/testing/omit": "LodashTestingController.omitTest",
   "POST /jsonTest": "LodashTestingController.jsonTest",
+  "POST /lodash/testing/map": "LodashTestingController.map",
 
-  //User COntroller
+  /** DevDutt Project Routs start Here... */
+  //User Controller
   "POST /user/create": "user/UserController.create",
   "POST /user/update": "user/UserController.update",
   "GET /user/get": "user/UserController.get",
@@ -62,6 +64,7 @@ module.exports.routes = {
   "POST /trip/create": "trip/TripController.create",
   "POST /trip/update": "trip/TripController.update",
   "POST /trip/delete": "trip/TripController.delete",
+  "POST /trip/get/related-trips": "trip/TripController.relatedTrips",
 
   // Booking Controller
   "GET /booking/get": "booking/BookingController.get",
@@ -70,16 +73,31 @@ module.exports.routes = {
   "POST /booking/create": "booking/BookingController.create",
   "POST /booking/update": "booking/BookingController.update",
   "POST /booking/delete": "booking/BookingController.delete",
+  "POST /booking/get/related-bookings":
+    "booking/BookingController.relatedBookings",
 
-  // PicRequest Controller
-  "GET /pick-request/get": "pickRequest/PickRequestController.get",
+  // PickRequest Controller
+  "GET /pick-request/get/:id": "pickRequest/PickRequestController.getById",
   "POST /pick-request/create": "pickRequest/PickRequestController.create",
   "GET /pick-request/get-trip-requests":
     "pickRequest/PickRequestController.getTripRequests",
   "GET /pick-request/get-booking-requests":
     "pickRequest/PickRequestController.getBookingRequests",
   "POST /pick-request/approve": "pickRequest/PickRequestController.approve",
+  "POST /pick-request/delete": "pickRequest/PickRequestController.delete",
 
+  // Validation Controller
+  "GET /verification/get-otp/:id": "pickRequest/VerificationController.getOtp",
+  "POST /verification/verify-otp":
+    "pickRequest/VerificationController.verifyOtp",
+
+  // Receiver Controller
+  "GET /receiver/getById/:id": "booking/ReceiverController.getById",
+  "POST /receiver/confirm-receiver":
+    "booking/ReceiverController.confirmReceiver",
+
+  // Paymetn Razorpay
+  "POST /razorpay/payment": "PaymentController.razorpayTest",
   /***************************************************************************
    *                                                                          *
    * More custom routes here...                                               *

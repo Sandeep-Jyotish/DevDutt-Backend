@@ -19,25 +19,37 @@ module.exports.policies = {
     update: "hasUserToken",
   },
 
+  "user/AuthController": {
+    logout: "hasUserToken",
+  },
+
   "trip/TripController": {
     get: "hasUserToken",
     create: "hasUserToken",
     update: "hasUserToken",
     delete: "hasUserToken",
+    relatedTrips: "hasUserToken",
   },
   "booking/BookingController": {
     get: "hasUserToken",
     create: "hasUserToken",
     update: "hasUserToken",
     delete: "hasUserToken",
+    relatedBookings: "hasUserToken",
   },
+
   "pickRequest/PickRequestController": {
-    get: "hasUserToken",
+    getById: "hasUserToken",
     create: "hasUserToken",
     update: "hasUserToken",
     getTripRequests: "hasUserToken",
     getBookingRequests: "hasUserToken",
     approve: "hasUserToken",
+    delete: "hasUserToken",
+  },
+  "pickRequest/VerificationController": {
+    getOtp: "hasUserToken",
+    verifyOtp: "hasUserToken",
   },
   // '*': true,
 };

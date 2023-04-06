@@ -36,6 +36,7 @@ const ValidationRules = {
   User: {
     firstName: "string|max:128",
     lastName: "string|max:128",
+    picture: "string|max:128",
     phoneNo: "string",
     email: "email",
     password: [
@@ -55,16 +56,22 @@ const ValidationRules = {
   },
   Booking: {
     id: "required|string|max:40",
-    item: "required|string|max:128",
-    weightType: ["required", { in: ["G", "KG"] }],
-    weight: ["required"],
+    myself: "boolean",
+    item: ["string", "max:128", { required_if: ["myself", false] }],
+    weightType: [{ in: ["G", "KG"] }, { required_if: ["myself", false] }],
+    weight: [{ required_if: ["myself", false] }],
     startingPoint: "required|string|max:128",
     endingPoint: "required|string|max:128",
     expStartTime: "required",
     expEndTime: "required",
+    details: "string|max:300",
+    isBooked: "boolean",
+    isReceiverReady: "boolean",
+    isReached: "boolean",
   },
   Trip: {
     id: "required|string|max:40",
+    noOfPerson: "integer",
     startingPoint: "required|string|max:128",
     endingPoint: "required|string|max:128",
     startTime: "required",
@@ -72,13 +79,24 @@ const ValidationRules = {
     vehicleType: "required|string|max:40",
     weightType: ["required", { in: ["G", "KG"] }],
     weightCapacity: ["required"],
+    noOfPerson: "integer",
     details: "string|max:300",
   },
   PickRequest: {
     id: "required|string|max:40",
     tripId: "required|string|max:40",
     bookingId: "required|string|max:40",
+    otp: "integer",
     requestFor: ["required", { in: ["Booking", "Trip"] }],
+  },
+  Receiver: {
+    id: "required|string|max:40",
+    firstName: "required|string|max:128",
+    lastName: "required|string|max:128",
+    picture: "string|max:128",
+    phoneNo: "required|string",
+    email: "required|email",
+    bookingId: "string|max:40",
   },
 };
 
@@ -104,6 +122,13 @@ function isEmpty(val) {
     : false;
 }
 
+// Razorpay intigration
+const razorPay = require("razorpay");
+const razorPayInstance = new razorPay({
+  key_id: "rzp_test_Nzhd7DrTNJgoYz",
+  key_secret: "utMBllnE0NbzCjY2Q7RbrReJ",
+});
+
 module.exports.constants = {
   ResponseCodes,
   UUID: uuidv4,
@@ -115,4 +140,5 @@ module.exports.constants = {
   Validator,
   Bcrypt,
   JWT,
+  razorPayInstance,
 };

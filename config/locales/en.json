@@ -1,4 +1,30 @@
 {
   "Welcome": "Welcome",
-  "A brand new app.": "A brand new app."
+  "A brand new app.": "A brand new app.",
+  "User.AlreadyExist": "User already Exists on that Email",
+  "User.PasswordMissMatched": "Incorrect PAssword",
+  "User.WrongPassword": "Wrong Password",
+  "User.Created": "User Created Successfully",
+  "User.AuthTokenError": "Auth Token Could Not Generated",
+  "User.LogOut": "You are Successfully Logged Out",
+  "User.LogOutError": "Something went Wrong on Log out",
+  "User.LoggedinSuccessfully": "Password Matched & You are now Logged In",
+
+  "Booking.NotFound": "Booking Not Found",
+  "Booking.RelatedBookings": "Successfully Found the related Bookings for your Trip",
+  "Booking.PastStartTimeError": "Booking Start Time Can not be Past",
+  "Booking.SameStartAndEndTime": "Start Time Can not be same or greater than AS Reach Time",
+  "Booking.Create": "Booking Created Successfully",
+  "Booking.Update": "Booking Updated Successfully",
+  "Booking.UpdateError": "Booking can not be update",
+  "Booking.AlreadyApproved": "Your Booking is Already Approved",
+
+  "Trip.NotFound": "Trip Not Found",
+  "Trip.PastStartTimeError": "Trip Start Time Can not be Past",
+  "Trip.SameStartAndEndTime": "Trip Start Time Can not be same or greater than AS Reach Time",
+  "Trip.AlreadyTripExists": "You already have a Trip at that Time",
+  "Trip.Create": "Trip Created Successfully",
+  "Trip.Update": "Trip Updated Successfully",
+  "Trip.UpdateError": "Trip can not be update",
+  "Trip.AlreadyApproved": "Your Trip is already approved"
 }

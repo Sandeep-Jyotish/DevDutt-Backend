@@ -5,6 +5,7 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 const { ResponseCodes, isEmpty } = sails.config.constants;
+const GetMessages = sails.config.getMessages;
 module.exports = {
   /**
    * @description This method will create a trip for the user
@@ -15,9 +16,12 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   create: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
     try {
-      //fields to validate
-      let fields = [
+      //fields to validate of Trip details
+      let tripFields = [
+        "noOfPerson",
         "startingPoint",
         "endingPoint",
         "startTime",
@@ -29,8 +33,11 @@ module.exports = {
       ];
 
       // Validate the data
-      let result = await Trip.validateBeforeCreateOrUpdate(req.body, fields);
-      if (result.hasError) {
+      let tripResult = await Trip.validateBeforeCreateOrUpdate(
+        req.body,
+        tripFields
+      );
+      if (tripResult.hasError) {
         //if has any error in input field
         return res.badRequest({
           status: ResponseCodes.BAD_REQUEST,
@@ -43,6 +50,7 @@ module.exports = {
         let currentTime = Math.floor(Date.now() / 1000);
         //json destructuring
         let {
+          noOfPerson,
           startingPoint,
           endingPoint,
           startTime,
@@ -51,7 +59,7 @@ module.exports = {
           weightType,
           weightCapacity,
           details,
-        } = result.data;
+        } = tripResult.data;
 
         // converting time to unix
         let startCnvrt = Date.parse(startTime);
@@ -65,7 +73,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Start Time Can not be Past",
+            message: GetMessages("Trip.PastStartTimeError", lang),
             error: "",
           });
         }
@@ -74,7 +82,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Start Time Can not be same or greater than AS Reach Time",
+            message: GetMessages("Trip.SameStartAndEndTime", lang),
             error: "",
           });
         }
@@ -100,12 +108,11 @@ module.exports = {
         //find the trip
         let prevTrip = await Trip.find(where);
         if (prevTrip.length <= 0) {
-          //generating Trip ID
-          let id = sails.config.constants.UUID();
           // set data to store in database
-          let dataToStore = {
-            id: id,
+          let tripDataToStore = {
+            id: sails.config.constants.UUID(),
             tripBy: req.me.id,
+            noOfPerson: noOfPerson,
             startingPoint: startingPoint,
             endingPoint: endingPoint,
             startTime: unixStartTime,
@@ -120,12 +127,46 @@ module.exports = {
             updatedBy: req.me.id,
           };
 
-          // creatae the Trip for user
-          let create = await Trip.create(dataToStore).fetch();
+          // create the Trip for user
+          let create = await Trip.create(tripDataToStore).fetch();
+
+          // find Bookings who has the same destination and timing
+          // Preparing the query object
+          let where = {
+            startingPoint: startingPoint,
+            endingPoint: endingPoint,
+            expStartTime: { ">=": unixStartTime },
+            expEndTime: { "<=": unixEndTime },
+            // myself: false,
+            isDeleted: false,
+          };
+          if (noOfPerson >= 1) {
+            where.or = [
+              {
+                myself: true,
+              },
+              {
+                myself: false,
+              },
+            ];
+          } else {
+            where.myself = false;
+          }
+          let bookingObj = {
+            where: where,
+            sort: "expStartTime DESC",
+          };
+          console.log(bookingObj);
+          // find boookings and user
+          let bookings = await Booking.find(bookingObj).populate("bookingBy");
+          if (bookings.length > 0) {
+            // Send notification to the Booking user about this Trip
+            // Also send the Booking details to the user who want Trip
+          }
           //send the response
           return res.ok({
             status: ResponseCodes.OK,
-            data: create,
+            data: { bookings, create },
             error: "",
           });
         } else {
@@ -133,7 +174,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "You already have a Trip at that Time",
+            message: GetMessages("Trip.AlreadyTripExists", lang),
             error: "",
           });
         }
@@ -157,6 +198,8 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   update: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
     try {
       //fields to validate
       let fields = [
@@ -209,7 +252,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Start Time Can not be Past",
+            message: GetMessages("Trip.PastStartTimeError", lang),
             error: "",
           });
         }
@@ -219,7 +262,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Start Time Can not be same or greater than AS Reach Time",
+            message: GetMessages("Trip.SameStartAndEndTime", lang),
             error: "",
           });
         }
@@ -277,7 +320,7 @@ module.exports = {
             return res.ok({
               status: ResponseCodes.OK,
               data: update,
-              message: "Trip Updated Successfully",
+              message: GetMessages("Trip.Update", lang),
               error: "",
             });
           } else {
@@ -285,7 +328,7 @@ module.exports = {
             return res.badRequest({
               status: ResponseCodes.BAD_REQUEST,
               data: {},
-              message: "You already have a Trip at that Time",
+              message: GetMessages("Trip.AlreadyTripExists", lang),
               error: "",
             });
           }
@@ -294,7 +337,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Can not Find Trip",
+            message: GetMessages("Trip.NotFound", lang),
             error: "",
           });
         }
@@ -318,6 +361,8 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   get: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
     try {
       let { skip, limit } = req.query;
       let where = { tripBy: req.me.id, isDeleted: false };
@@ -361,6 +406,8 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   getById: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
     try {
       // get the trip id
       let id = req.params.id;
@@ -399,6 +446,87 @@ module.exports = {
     }
   },
   /**
+   * @description This method will returns all the Trips details
+   * according to or suit for the Booking id
+   * @method POST
+   * @param {Request} req
+   * @param {Response} res
+   * @returns HTTP Response
+   * @author Sandeep Jyotish (Zignuts)
+   */
+  relatedTrips: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
+    try {
+      // Validate the id of Booking
+      let result = await Booking.validateBeforeCreateOrUpdate(req.body, ["id"]);
+      if (result.hasError) {
+        //if has any error in input field
+        return res.badRequest({
+          status: ResponseCodes.BAD_REQUEST,
+          data: {},
+          message: Object.keys(result.errors).length,
+          error: result.errors,
+        });
+      } else {
+        let { id } = result.data;
+
+        // find the Booking details
+        let bookingDetails = await Booking.findOne({
+          id: id,
+          bookingBy: req.me.id,
+          isDeleted: false,
+        });
+        if (!bookingDetails) {
+          // return Error
+          return res.badRequest({
+            status: ResponseCodes.BAD_REQUEST,
+            data: {},
+            message: GetMessages("Booking.NotFound", lang),
+            error: "",
+          });
+        }
+        // find Trips who has the same destination and timing
+        // Preparing the query object
+        let where = {
+          startingPoint: bookingDetails.startingPoint,
+          endingPoint: bookingDetails.endingPoint,
+          startTime: { ">=": bookingDetails.expStartTime },
+          endTime: { "<=": bookingDetails.expEndTime },
+          isDeleted: false,
+        };
+        if (bookingDetails.myself) {
+          where.noOfPerson = { ">=": 1 };
+        }
+
+        let tripObj = {
+          where: where,
+          sort: "startTime DESC",
+        };
+
+        // find trips and user
+        let trips = await Trip.find(tripObj).populate("tripBy");
+        let count = await Trip.count(where);
+        //send the response
+        return res.ok({
+          status: ResponseCodes.OK,
+          total: count,
+          data: trips,
+          message: "These are the related Trips to your Booking",
+          error: "",
+        });
+      }
+    } catch (error) {
+      //return error
+      return res.serverError({
+        status: ResponseCodes.SERVER_ERROR,
+        data: {},
+        message: "",
+        error: error.toString(),
+      });
+    }
+  },
+  /**
    * @description This method is used for advanced filter search on Trip
    * @method GET
    * @param {Request} req
@@ -407,6 +535,8 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   advanceFilter: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
     try {
       //get the query data
       let {
@@ -420,6 +550,8 @@ module.exports = {
         weightType,
         weightCapacity,
       } = req.query;
+      //current time
+      let currentTime = Math.floor(Date.now() / 1000);
 
       let selectClause,
         fromClause,
@@ -429,7 +561,9 @@ module.exports = {
 
       selectClause = `SELECT *`;
       fromClause = `\n FROM test.trip as tr`;
-      whereClause = `\n WHERE isDeleted = false`;
+      whereClause = `\n WHERE isDeleted = false
+                        AND tr.startTime > ${currentTime}
+                    `;
       let nativeCount = `
             SELECT
                   count(*) as cnt
@@ -521,6 +655,8 @@ module.exports = {
    * @author Sandeep Jyotish (Zignuts)
    */
   delete: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
     let error = "";
     let code = "";
     try {
@@ -551,7 +687,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Trip Not Found",
+            message: GetMessages("Trip.NotFound", lang),
             error: "",
           });
         }
@@ -563,15 +699,12 @@ module.exports = {
             isApproved: true,
             isDeleted: false,
           },
-        });
+        }).populate("bookingId");
+        let bookingIds = [];
         if (pickRequest.length > 0) {
-          // if any pickRequest is active on that Booking
-          // return Error
-          return res.badRequest({
-            status: ResponseCodes.BAD_REQUEST,
-            data: {},
-            message: "Your Trip is already approved",
-            error: "",
+          // if any pickRequest is active on that Trip
+          pickRequest.forEach((element) => {
+            bookingIds.push(element.bookingId.id);
           });
         }
         // start the transaction
@@ -599,6 +732,28 @@ module.exports = {
               code = ResponseCodes.BAD_REQUEST;
               throw error;
             });
+
+          // when Trip was approved on PickRequest
+          if (bookingIds.length > 0) {
+            // update all Bookings
+            await Booking.update(bookingIds)
+              .set({
+                isBooked: false,
+                tripId: null,
+                updatedAt: currentTime,
+                updatedBy: req.me.id,
+              })
+              .usingConnection(db)
+              .catch((err) => {
+                sails.log.error(
+                  "Error from Trip delete controller, while update record in booking table"
+                );
+                //if database error
+                error = err.toString();
+                code = ResponseCodes.BAD_REQUEST;
+                throw error;
+              });
+          }
 
           // delete the Trip
           await Trip.updateOne({
