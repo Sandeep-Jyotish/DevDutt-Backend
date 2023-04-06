@@ -73,7 +73,6 @@ module.exports = {
                 authToken: token,
                 lastLoginTime: currentTime,
               });
-              console.log(lang);
 
               //Send Response
               return res.ok({
