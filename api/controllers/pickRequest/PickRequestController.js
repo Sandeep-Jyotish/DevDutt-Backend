@@ -4,7 +4,8 @@
  * @description :: Server-side actions for handling incoming requests.
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
-const { ResponseCodes, isEmpty } = sails.config.constants;
+const { ResponseCodes, isEmpty, VehicleType, weightType, VehicleBasePrice } =
+  sails.config.constants;
 const GetMessages = sails.config.getMessages;
 module.exports = {
   /**
@@ -59,6 +60,176 @@ module.exports = {
   },
   /**
    * @description This method will create a Request for the user to Booking or Trip
+   * @method POST
+   * @param {Request} req
+   * @param {Response} res
+   * @returns HTTP Response
+   * @author Sandeep Jyotish (Zignuts)
+   */
+  fareCalculate: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
+    try {
+      //fields to validate
+      let fields = ["tripId", "bookingId"];
+      // Validate the data
+      let result = await PickRequest.validateBeforeCreateOrUpdate(
+        req.body,
+        fields
+      );
+      if (result.hasError) {
+        //if has any error in input field
+        return res.badRequest({
+          status: ResponseCodes.BAD_REQUEST,
+          data: {},
+          message: Object.keys(result.errors).length,
+          error: result.errors,
+        });
+      } else {
+        //current time
+        let currentTime = Math.floor(Date.now() / 1000);
+        // json destructing
+        let { tripId, bookingId } = result.data;
+        // find the Booking Details
+        let bookingDetails = await Booking.findOne({
+          where: {
+            id: bookingId,
+            isBooked: false,
+            isReached: false,
+            isDeleted: false,
+          },
+        });
+        if (!bookingDetails) {
+          //return error
+          return res.badRequest({
+            status: ResponseCodes.BAD_REQUEST,
+            data: {},
+            message: "No Booking Found on that Id",
+            error: "",
+          });
+        }
+        // find the trip details
+        let tripDetails = await Trip.findOne({
+          where: {
+            id: tripId,
+            isDeleted: false,
+          },
+        });
+        if (!tripDetails) {
+          //return error
+          return res.badRequest({
+            status: ResponseCodes.BAD_REQUEST,
+            data: {},
+            message: "No Trip Found on that Id",
+            error: "",
+          });
+        }
+        if (bookingDetails.bookingBy === tripDetails.tripBy) {
+          //return error
+          return res.badRequest({
+            status: ResponseCodes.BAD_REQUEST,
+            data: {},
+            message: "You Can not Book Your Own Trip on Booking",
+            error: "",
+          });
+        }
+
+        // declare fare value
+        let fare;
+
+        // item value calculation
+        let valueOfItem = 0;
+        // calculate valueOfItem for person
+        if (bookingDetails.myself) {
+          valueOfItem = 2;
+        }
+        // if Booking is for send Item
+        if (bookingDetails.item !== null) {
+          // set weight
+          let weight = bookingDetails.weight;
+          if (bookingDetails.weightType === weightType.KiloGram) {
+            weight = weight / 1000;
+          }
+          // calculate value of Item when weight is available
+          switch (weight) {
+            case weight <= 500: {
+              valueOfItem = 1;
+              break;
+            }
+            case weight > 500 && weight <= 1000: {
+              valueOfItem = 2;
+              break;
+            }
+            case weight > 1000 && weight <= 1500: {
+              valueOfItem = 3;
+              break;
+            }
+          }
+        }
+
+        // Calculate Fare
+        switch (tripDetails.vehicleType) {
+          case VehicleType.Cycle: {
+            // fare calculation for vehicle Type Cycle
+            fare = VehicleBasePrice.ForCycle * valueOfItem;
+            break;
+          }
+          case VehicleType.Bike: {
+            // fare calculation for vehicle Type Bike
+            fare = VehicleBasePrice.ForBike * valueOfItem;
+            break;
+          }
+          case VehicleType.Auto: {
+            // fare calculation for vehicle Type Auto
+            fare = VehicleBasePrice.ForAuto * valueOfItem;
+            break;
+          }
+          case VehicleType.Car: {
+            // fare calculation for vehicle Type Car
+            fare = VehicleBasePrice.ForCar * valueOfItem;
+            break;
+          }
+          case VehicleType.Bus: {
+            // fare calculation for vehicle Type Bus
+            fare = VehicleBasePrice.ForBus * valueOfItem;
+            break;
+          }
+          case VehicleType.Train: {
+            // fare calculation for vehicle Type Train
+            fare = VehicleBasePrice.ForTrain * valueOfItem;
+            break;
+          }
+          case VehicleType.Flight: {
+            // fare calculation for vehicle Type Flight
+            fare = VehicleBasePrice.ForFlight * valueOfItem;
+            break;
+          }
+          case VehicleType.Ship: {
+            // fare calculation for vehicle Type Ship
+            fare = VehicleBasePrice.ForShip * valueOfItem;
+            break;
+          }
+        }
+        //sending OK response
+        return res.ok({
+          status: ResponseCodes.OK,
+          fare: fare,
+          message: "Your Fare",
+          error: "",
+        });
+      }
+    } catch (error) {
+      //return error
+      return res.serverError({
+        status: ResponseCodes.SERVER_ERROR,
+        data: {},
+        message: "",
+        error: error.toString(),
+      });
+    }
+  },
+  /**
+   * @description This method will calaculate the fare for createa PickRequest
    * @method POST
    * @param {Request} req
    * @param {Response} res

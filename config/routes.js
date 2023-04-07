@@ -85,6 +85,8 @@ module.exports.routes = {
     "pickRequest/PickRequestController.getBookingRequests",
   "POST /pick-request/approve": "pickRequest/PickRequestController.approve",
   "POST /pick-request/delete": "pickRequest/PickRequestController.delete",
+  "POST /pick-request/fare-count":
+    "pickRequest/PickRequestController.fareCalculate",
 
   // Validation Controller
   "GET /verification/get-otp/:id": "pickRequest/VerificationController.getOtp",

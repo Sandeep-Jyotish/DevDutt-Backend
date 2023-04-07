@@ -47,6 +47,7 @@ module.exports = {
       isIn: [
         VehicleType.Cycle,
         VehicleType.Bike,
+        VehicleType.Auto,
         VehicleType.Car,
         VehicleType.Bus,
         VehicleType.Train,

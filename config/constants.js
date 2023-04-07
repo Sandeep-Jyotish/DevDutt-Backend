@@ -31,14 +31,28 @@ const CustomValidationMsg = {
 const passwordRegex =
   /(?=^.{8,}$)(?=.*\d)(?=.*[~()_+='":;?/|.><,`}{!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
 
+// vehicle Type
 const VehicleType = {
   Cycle: "Cycle",
   Bike: "Bike",
+  Auto: "Auto",
   Car: "Car",
   Bus: "Bus",
   Train: "Train",
   Flight: "Flight",
   Ship: "Ship",
+};
+
+// Vehicle wise Base Price
+const VehicleBasePrice = {
+  ForCycle: 1,
+  ForBike: 2,
+  ForAuto: 3,
+  ForCar: 4,
+  ForBus: 5,
+  ForTrain: 6,
+  ForFlight: 7,
+  ForShip: 8,
 };
 
 const weightType = {
@@ -104,6 +118,7 @@ const ValidationRules = {
         in: [
           VehicleType.Cycle,
           VehicleType.Bike,
+          VehicleType.Auto,
           VehicleType.Car,
           VehicleType.Bus,
           VehicleType.Train,
@@ -179,4 +194,5 @@ module.exports.constants = {
   VehicleType,
   weightType,
   requestType,
+  VehicleBasePrice,
 };
