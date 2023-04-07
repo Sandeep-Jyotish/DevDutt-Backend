@@ -31,6 +31,25 @@ const CustomValidationMsg = {
 const passwordRegex =
   /(?=^.{8,}$)(?=.*\d)(?=.*[~()_+='":;?/|.><,`}{!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
 
+const VehicleType = {
+  Cycle: "Cycle",
+  Bike: "Bike",
+  Car: "Car",
+  Bus: "Bus",
+  Train: "Train",
+  Flight: "Flight",
+  Ship: "Ship",
+};
+
+const weightType = {
+  Gram: "G",
+  KiloGram: "KG",
+};
+
+const requestType = {
+  Booking: "Booking",
+  Trip: "Trip",
+};
 //Validation Rules
 const ValidationRules = {
   User: {
@@ -58,7 +77,10 @@ const ValidationRules = {
     id: "required|string|max:40",
     myself: "boolean",
     item: ["string", "max:128", { required_if: ["myself", false] }],
-    weightType: [{ in: ["G", "KG"] }, { required_if: ["myself", false] }],
+    weightType: [
+      { in: [weightType.Gram, weightType.KiloGram] },
+      { required_if: ["myself", false] },
+    ],
     weight: [{ required_if: ["myself", false] }],
     startingPoint: "required|string|max:128",
     endingPoint: "required|string|max:128",
@@ -76,8 +98,21 @@ const ValidationRules = {
     endingPoint: "required|string|max:128",
     startTime: "required",
     endTime: "required",
-    vehicleType: "required|string|max:40",
-    weightType: ["required", { in: ["G", "KG"] }],
+    vehicleType: [
+      "required",
+      {
+        in: [
+          VehicleType.Cycle,
+          VehicleType.Bike,
+          VehicleType.Car,
+          VehicleType.Bus,
+          VehicleType.Train,
+          VehicleType.Flight,
+          VehicleType.Ship,
+        ],
+      },
+    ],
+    weightType: ["required", { in: [weightType.Gram, weightType.KiloGram] }],
     weightCapacity: ["required"],
     noOfPerson: "integer",
     details: "string|max:300",
@@ -87,7 +122,7 @@ const ValidationRules = {
     tripId: "required|string|max:40",
     bookingId: "required|string|max:40",
     otp: "integer",
-    requestFor: ["required", { in: ["Booking", "Trip"] }],
+    requestFor: ["required", { in: [requestType.Booking, requestType.Trip] }],
   },
   Receiver: {
     id: "required|string|max:40",
@@ -129,19 +164,6 @@ const razorPayInstance = new razorPay({
   key_secret: "utMBllnE0NbzCjY2Q7RbrReJ",
 });
 
-const VehicleType = {
-  Bike: "Bike",
-  Car: "Car",
-  Bus: "Bus",
-  Train: "Train",
-  Flight: "Flight",
-};
-
-const weightType = {
-  Gram: "G",
-  KiloGram: "KG",
-};
-
 module.exports.constants = {
   ResponseCodes,
   UUID: uuidv4,
@@ -156,4 +178,5 @@ module.exports.constants = {
   razorPayInstance,
   VehicleType,
   weightType,
+  requestType,
 };

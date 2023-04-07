@@ -4,7 +4,7 @@
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
-const { Validator, ValidationRules, CustomValidationMsg } =
+const { Validator, ValidationRules, CustomValidationMsg, requestType } =
   sails.config.constants;
 module.exports = {
   tableName: "pick_request",
@@ -19,7 +19,7 @@ module.exports = {
       type: "string",
       columnType: "enum",
       required: true,
-      isIn: ["Booking", "Trip"],
+      isIn: [requestType.Booking, requestType.Trip],
     },
     isApproved: {
       type: "boolean",
