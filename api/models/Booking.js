@@ -4,7 +4,7 @@
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
-const { Validator, ValidationRules, CustomValidationMsg } =
+const { Validator, ValidationRules, CustomValidationMsg, weightType } =
   sails.config.constants;
 module.exports = {
   tableName: "booking",
@@ -28,7 +28,7 @@ module.exports = {
       type: "string",
       columnType: "enum",
       allowNull: true,
-      isIn: ["G", "KG"],
+      isIn: [weightType.Gram, weightType.KiloGram],
     },
     weight: {
       type: "number",

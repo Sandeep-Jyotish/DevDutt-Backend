@@ -129,6 +129,19 @@ const razorPayInstance = new razorPay({
   key_secret: "utMBllnE0NbzCjY2Q7RbrReJ",
 });
 
+const VehicleType = {
+  Bike: "Bike",
+  Car: "Car",
+  Bus: "Bus",
+  Train: "Train",
+  Flight: "Flight",
+};
+
+const weightType = {
+  Gram: "G",
+  KiloGram: "KG",
+};
+
 module.exports.constants = {
   ResponseCodes,
   UUID: uuidv4,
@@ -141,4 +154,6 @@ module.exports.constants = {
   Bcrypt,
   JWT,
   razorPayInstance,
+  VehicleType,
+  weightType,
 };
