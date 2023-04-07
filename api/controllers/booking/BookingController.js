@@ -145,7 +145,7 @@ module.exports = {
           startingPoint: tripDetails.startingPoint,
           endingPoint: tripDetails.endingPoint,
           expStartTime: { ">=": tripDetails.startTime },
-          expEndTime: { "<=": tripDetails.endTime },
+          expEndTime: { ">=": tripDetails.endTime },
           isBooked: false,
           isDeleted: false,
         };
@@ -750,22 +750,45 @@ module.exports = {
         }
 
         // find PickRequest on that booking
-        let pickRequest = await PickRequest.find({
+        let pickRequest = await PickRequest.findOne({
           where: {
             bookingId: id,
             isApproved: true,
             isDeleted: false,
           },
-        });
-        if (pickRequest.length > 0) {
+        }).populate("tripId");
+        let tripUpdateData = {};
+
+        // set value of weight of trip and booking
+        let tripCpacity = pickRequest.tripId.weightCapacity;
+        let bookingWeight = bookingDetails.weight;
+        if (pickRequest) {
           // if any pickRequest is active on that Booking
-          // return Error
-          return res.badRequest({
-            status: ResponseCodes.BAD_REQUEST,
-            data: {},
-            message: GetMessages("Booking.AlreadyApproved", lang),
-            error: "",
-          });
+          // calculate the weight
+
+          let weightCapacity;
+          if (bookingDetails.item !== null) {
+            if (pickRequest.tripId.weightType === "KG") {
+              //  converting weight into gram
+              tripCpacity = tripCpacity * 1000;
+            }
+            if (bookingDetails.weightType === "KG") {
+              //  converting weight into gram
+              bookingWeight = bookingWeight * 1000;
+            }
+            weightCapacity = tripCpacity + bookingWeight;
+            if (pickRequest.tripId.weightType === "KG") {
+              weightCapacity = weightCapacity / 1000;
+            }
+            tripUpdateData.weightCapacity = weightCapacity;
+          }
+          // set values to update at trip table
+          tripUpdateData.noOfPerson =
+            bookingDetails.myself === true
+              ? pickRequest.tripId.noOfPerson + 1
+              : pickRequest.tripId.noOfPerson;
+          tripUpdateData.updatedBy = req.me.id;
+          tripUpdateData.updatedAt = currentTime;
         }
         // start the transaction
         await sails.getDatastore().transaction(async (db) => {
@@ -778,6 +801,8 @@ module.exports = {
             },
           })
             .set({
+              isApproved: false,
+              otp: null,
               isDeleted: true,
               deletedAt: currentTime,
               deletedBy: req.me.id,
@@ -815,6 +840,23 @@ module.exports = {
               code = ResponseCodes.BAD_REQUEST;
               throw error;
             });
+          if (!isEmpty(tripUpdateData)) {
+            await Trip.updateOne({
+              id: pickRequest.tripId.id,
+              isDeleted: false,
+            })
+              .set(tripUpdateData)
+              .usingConnection(db)
+              .catch((err) => {
+                sails.log.error(
+                  "Error from Booking delete controller, while delete record in trip table"
+                );
+                //if database error
+                error = err.toString();
+                code = ResponseCodes.BAD_REQUEST;
+                throw error;
+              });
+          }
         });
         //sending OK response
         return res.ok({

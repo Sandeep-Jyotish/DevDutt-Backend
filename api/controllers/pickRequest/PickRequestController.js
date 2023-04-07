@@ -451,7 +451,7 @@ module.exports = {
         let bookingWeight = bookingDetails.weight;
 
         // calculate the weightCapacity to set
-
+        let weightCapacity;
         if (bookingDetails.item !== null) {
           if (tripDetails.weightType === "KG") {
             //  converting weight into gram
@@ -470,10 +470,10 @@ module.exports = {
               error: "",
             });
           }
-        }
-        let weightCapacity = tripCpacity - bookingWeight;
-        if (tripDetails.weightType === "KG") {
-          weightCapacity = weightCapacity / 1000;
+          weightCapacity = tripCpacity - bookingWeight;
+          if (tripDetails.weightType === "KG") {
+            weightCapacity = weightCapacity / 1000;
+          }
         }
         // calculate noOfPerson and set to the Trip details
         let noOfPerson = tripDetails.noOfPerson;
