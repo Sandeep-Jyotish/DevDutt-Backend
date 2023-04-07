@@ -796,7 +796,6 @@ module.exports = {
           await PickRequest.update({
             where: {
               bookingId: id,
-              isApproved: false,
               isDeleted: false,
             },
           })
