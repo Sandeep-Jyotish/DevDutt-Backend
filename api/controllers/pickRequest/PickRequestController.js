@@ -86,8 +86,6 @@ module.exports = {
           error: result.errors,
         });
       } else {
-        //current time
-        let currentTime = Math.floor(Date.now() / 1000);
         // json destructing
         let { tripId, bookingId } = result.data;
         // find the Booking Details
@@ -129,7 +127,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "You Can not Book Your Own Trip on Booking",
+            message: GetMessages("PickRequest.SameTrip", lang),
             error: "",
           });
         }
