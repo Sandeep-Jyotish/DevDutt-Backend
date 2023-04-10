@@ -24,7 +24,9 @@
   "Booking.NoReceiver": "Booking has no Receiver",
   "Booking.AlreadyBooked": "This Booking is already booked",
 
+  "Receiver.NotFound": "Receiver Not Found",
   "Receiver.NotReady": "Receiver is not ready to Receive",
+  "Receiver.ReadyBefore": "Receiver is ready before",
 
   "Trip.NotFound": "Trip Not Found",
   "Trip.PastStartTimeError": "Trip Start Time Can not be Past",
@@ -47,5 +49,11 @@
   "PickRequest.AlreadyApproved": "Request is already Approved",
   "PickRequest.Approve": "Your Request is Approved",
   "PickRequest.Delete": "Pick Request Deleted Successfully",
-  "PickRequest.Reject": "Pick Request is Rejected Successfully"
+  "PickRequest.Reject": "Pick Request is Rejected Successfully",
+  "PickRequest.NotApproved": "Your Request is not Approved",
+
+  "Otp.NotAllowedToGet": "You are not allowed to get OTP",
+  "Otp.Wrong": "You entered Wrong OTP",
+  "Otp.NotAllowedToVerify": "You are not allowed to verify",
+  "Otp.Verified": "OTP is matched and verified"
 }

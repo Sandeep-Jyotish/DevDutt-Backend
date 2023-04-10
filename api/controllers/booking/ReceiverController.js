@@ -56,7 +56,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Receiver Not Found",
+            message: GetMessages("Receiver.NotFound", lang),
             error: "",
           });
         }
@@ -114,16 +114,7 @@ module.exports = {
             return res.badRequest({
               status: ResponseCodes.BAD_REQUEST,
               data: {},
-              message: "Receiver is ready before",
-              error: "",
-            });
-          }
-          if (bookingDetails.isReceiverReady) {
-            // return Error
-            return res.badRequest({
-              status: ResponseCodes.BAD_REQUEST,
-              data: {},
-              message: "A Receiver is ready",
+              message: GetMessages("Receiver.NotFound", lang),
               error: "",
             });
           }
@@ -141,7 +132,7 @@ module.exports = {
           return res.ok({
             status: ResponseCodes.OK,
             data: update,
-            message: "Updated Successfully",
+            message: GetMessages("Booking.Update", lang),
             error: "",
           });
         } else {
@@ -149,7 +140,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Booking Not Found",
+            message: GetMessages("Booking.NotFound", lang),
             error: "",
           });
         }

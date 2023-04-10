@@ -37,7 +37,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "You are not allowed to get OTP",
+            message: GetMessages("Otp.NotAllowedToGet", lang),
             error: "",
           });
         }
@@ -47,7 +47,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Your Request is not Approved",
+            message: GetMessages("PickRequest.NotApproved", lang),
             error: "",
           });
         }
@@ -62,7 +62,7 @@ module.exports = {
         return res.badRequest({
           status: ResponseCodes.BAD_REQUEST,
           data: {},
-          message: "PickRequest Not Found",
+          message: GetMessages("PickRequest.NotFound", lang),
           error: "",
         });
       }
@@ -133,14 +133,14 @@ module.exports = {
             //sending OK response
             return res.ok({
               status: ResponseCodes.OK,
-              message: "Ready To Go..",
+              message: GetMessages("Otp.Verified", lang),
               error: "",
             });
           } else {
             return res.badRequest({
               status: ResponseCodes.BAD_REQUEST,
               data: {},
-              message: "Wrong OTP",
+              message: GetMessages("Otp.Wrong", lang),
               error: "",
             });
           }
@@ -148,7 +148,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "You are not allowed to verify",
+            message: GetMessages("Otp.NotAllowedToVerify", lang),
             error: "",
           });
         }
