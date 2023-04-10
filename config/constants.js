@@ -134,6 +134,7 @@ const ValidationRules = {
   },
   PickRequest: {
     id: "required|string|max:40",
+    fare: "required|integer|min:0",
     tripId: "required|string|max:40",
     bookingId: "required|string|max:40",
     otp: "integer",

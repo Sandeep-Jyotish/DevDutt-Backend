@@ -1,6 +1,9 @@
 {
   "Welcome": "Welcome",
   "A brand new app.": "A brand new app.",
+
+  "Database.Error": "Database Error",
+
   "User.AlreadyExist": "User already Exists on that Email",
   "User.PasswordMissMatched": "Incorrect PAssword",
   "User.WrongPassword": "Wrong Password",
@@ -18,13 +21,31 @@
   "Booking.Update": "Booking Updated Successfully",
   "Booking.UpdateError": "Booking can not be update",
   "Booking.AlreadyApproved": "Your Booking is Already Approved",
+  "Booking.NoReceiver": "Booking has no Receiver",
+  "Booking.AlreadyBooked": "This Booking is already booked",
+
+  "Receiver.NotReady": "Receiver is not ready to Receive",
 
   "Trip.NotFound": "Trip Not Found",
   "Trip.PastStartTimeError": "Trip Start Time Can not be Past",
   "Trip.SameStartAndEndTime": "Trip Start Time Can not be same or greater than AS Reach Time",
-  "Trip.AlreadyTripExists": "You already have a Trip at that Time",
+  "Trip.Exists": "You already have a Trip at that Time",
   "Trip.Create": "Trip Created Successfully",
   "Trip.Update": "Trip Updated Successfully",
   "Trip.UpdateError": "Trip can not be update",
-  "Trip.AlreadyApproved": "Your Trip is already approved"
+  "Trip.AlreadyApproved": "Your Trip is already approved",
+  "Trip.Started": "Trip has been Started",
+  "Trip.CapacityExceed": "Trip does not have enough Capacity",
+  "Trip.Delete": "Trip Deleted Successfully",
+  "Trip.RelatedTrips": "These are the related Trips to your Booking",
+
+  "PickRequest.NotFound": "Pick Request Not Found",
+  "PickRequest.Exists": "You already have a same Request",
+  "PickRequest.SameBooking": "You Can not Book Your Own Booking",
+  "PickRequest.SameTrip": "You Can not Book Your Own Trip",
+  "PickRequest.Create": "Pick Request is Created Successfully",
+  "PickRequest.AlreadyApproved": "Request is already Approved",
+  "PickRequest.Approve": "Your Request is Approved",
+  "PickRequest.Delete": "Pick Request Deleted Successfully",
+  "PickRequest.Reject": "Pick Request is Rejected Successfully"
 }

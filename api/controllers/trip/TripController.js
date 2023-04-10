@@ -174,7 +174,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: GetMessages("Trip.AlreadyTripExists", lang),
+            message: GetMessages("Trip.Exists", lang),
             error: "",
           });
         }
@@ -431,7 +431,7 @@ module.exports = {
         return res.badRequest({
           status: ResponseCodes.BAD_REQUEST,
           data: {},
-          message: "Trip Not Found",
+          message: GetMessages("Trip.NotFound", lang),
           error: "",
         });
       }
@@ -512,7 +512,7 @@ module.exports = {
           status: ResponseCodes.OK,
           total: count,
           data: trips,
-          message: "These are the related Trips to your Booking",
+          message: GetMessages("Trip.RelatedTrips", lang),
           error: "",
         });
       }
@@ -781,7 +781,7 @@ module.exports = {
         //sending OK response
         return res.ok({
           status: ResponseCodes.OK,
-          message: "Trip Deleted Successfully",
+          message: GetMessages("Trip.Delete", lang),
           error: "",
         });
       }
@@ -792,7 +792,7 @@ module.exports = {
         return res.badRequest({
           status: ResponseCodes.BAD_REQUEST,
           data: {},
-          message: "Database Error",
+          message: GetMessages("Database.Error", lang),
           error: error.toString(),
         });
       } else {

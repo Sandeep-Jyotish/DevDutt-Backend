@@ -21,6 +21,11 @@ module.exports = {
       required: true,
       isIn: [requestType.Booking, requestType.Trip],
     },
+    fare: {
+      type: "number",
+      required: true,
+      columnType: "unit(11)",
+    },
     isApproved: {
       type: "boolean",
       defaultsTo: false,

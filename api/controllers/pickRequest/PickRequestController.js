@@ -44,7 +44,7 @@ module.exports = {
         return res.badRequest({
           status: ResponseCodes.BAD_REQUEST,
           data: {},
-          message: "pickRequest Not Found",
+          message: GetMessages("PickRequest.NotFound", lang),
           error: "",
         });
       }
@@ -104,7 +104,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "No Booking Found on that Id",
+            message: GetMessages("Booking.NotFound", lang),
             error: "",
           });
         }
@@ -120,7 +120,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "No Trip Found on that Id",
+            message: GetMessages("Trip.NotFound", lang),
             error: "",
           });
         }
@@ -229,7 +229,7 @@ module.exports = {
     }
   },
   /**
-   * @description This method will calaculate the fare for createa PickRequest
+   * @description This method will calaculate the fare for create PickRequest
    * @method POST
    * @param {Request} req
    * @param {Response} res
@@ -241,7 +241,7 @@ module.exports = {
     const lang = req.getLocale();
     try {
       //fields to validate
-      let fields = ["tripId", "bookingId", "requestFor"];
+      let fields = ["tripId", "bookingId", "fare", "requestFor"];
 
       // Validate the data
       let result = await PickRequest.validateBeforeCreateOrUpdate(
@@ -260,7 +260,8 @@ module.exports = {
         //current time
         let currentTime = Math.floor(Date.now() / 1000);
         // json destructing
-        let { tripId, bookingId, requestFor } = result.data;
+        let { tripId, bookingId, fare, requestFor } = result.data;
+
         let requestTo;
         // find the Booking Details
         let bookingDetails = await Booking.findOne({
@@ -305,54 +306,73 @@ module.exports = {
             error: "",
           });
         }
-        // when request is for Booking
-        if (requestFor === "Booking") {
-          if (req.me.id === bookingDetails.bookingBy) {
-            //return error
-            return res.badRequest({
-              status: ResponseCodes.BAD_REQUEST,
-              data: {},
-              message: "You Can not Book Your Own Booking",
-              error: "",
-            });
-          }
-          requestTo = bookingDetails.bookingBy;
-        } else if (requestFor === "Trip") {
-          if (req.me.id === tripDetails.tripBy) {
-            //return error
-            return res.badRequest({
-              status: ResponseCodes.BAD_REQUEST,
-              data: {},
-              message: "You Can not Book Your Own Trip",
-              error: "",
-            });
-          }
-          requestTo = tripDetails.tripBy;
-        }
-
-        // set data to store in database
-        let dataToStore = {
-          id: sails.config.constants.UUID(),
-          requestFor: requestFor,
-          tripId: tripId,
-          bookingId: bookingId,
-          requestFrom: req.me.id,
-          requestTo: requestTo,
-          createdBy: req.me.id,
-          createdAt: currentTime,
-          updatedAt: currentTime,
-          updatedBy: req.me.id,
-        };
-
-        // create in database
-        let create = await PickRequest.create(dataToStore).fetch();
-        //sending OK response
-        return res.ok({
-          status: ResponseCodes.OK,
-          data: create,
-          message: "Request Sent Successfully",
-          error: "",
+        // find any pickRequest is already have or not
+        let pickRequest = await PickRequest.find({
+          where: {
+            bookingId: bookingId,
+            tripId: tripId,
+            isRejected: false,
+            isDeleted: false,
+          },
         });
+        if (pickRequest.length > 0) {
+          return res.badRequest({
+            status: ResponseCodes.BAD_REQUEST,
+            data: {},
+            message: GetMessages("PickRequest.Exists", lang),
+            error: "",
+          });
+        } else {
+          // when request is for Booking
+          if (requestFor === "Booking") {
+            if (req.me.id === bookingDetails.bookingBy) {
+              //return error
+              return res.badRequest({
+                status: ResponseCodes.BAD_REQUEST,
+                data: {},
+                message: GetMessages("PickRequest.SameBooking", lang),
+                error: "",
+              });
+            }
+            requestTo = bookingDetails.bookingBy;
+          } else if (requestFor === "Trip") {
+            if (req.me.id === tripDetails.tripBy) {
+              //return error
+              return res.badRequest({
+                status: ResponseCodes.BAD_REQUEST,
+                data: {},
+                message: GetMessages("PickRequest.SameTrip", lang),
+                error: "",
+              });
+            }
+            requestTo = tripDetails.tripBy;
+          }
+
+          // set data to store in database
+          let dataToStore = {
+            id: sails.config.constants.UUID(),
+            fare: fare,
+            requestFor: requestFor,
+            tripId: tripId,
+            bookingId: bookingId,
+            requestFrom: req.me.id,
+            requestTo: requestTo,
+            createdBy: req.me.id,
+            createdAt: currentTime,
+            updatedAt: currentTime,
+            updatedBy: req.me.id,
+          };
+
+          // create in database
+          let create = await PickRequest.create(dataToStore).fetch();
+          //sending OK response
+          return res.ok({
+            status: ResponseCodes.OK,
+            data: create,
+            message: GetMessages("PickRequest.Create", lang),
+            error: "",
+          });
+        }
       }
     } catch (error) {
       //return error
@@ -392,7 +412,7 @@ module.exports = {
         return res.badRequest({
           status: ResponseCodes.BAD_REQUEST,
           data: {},
-          message: "You don't have any Booking like this",
+          message: GetMessages("Booking.NotFound", lang),
           error: "",
         });
       }
@@ -463,7 +483,7 @@ module.exports = {
         return res.badRequest({
           status: ResponseCodes.BAD_REQUEST,
           data: {},
-          message: "You don't have any Trip like this",
+          message: GetMessages("Trip.NotFound", lang),
           error: "",
         });
       }
@@ -557,7 +577,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "PickRequest Not Found",
+            message: GetMessages("PickRequest.NotFound", lang),
             error: "",
           });
         }
@@ -568,7 +588,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Request is already Approved",
+            message: GetMessages("PickRequest.AlreadyApproved", lang),
             error: "",
           });
         }
@@ -581,7 +601,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Trip has been Started",
+            message: GetMessages("Trip.Started", lang),
             error: "",
           });
         }
@@ -595,14 +615,14 @@ module.exports = {
             return res.badRequest({
               status: ResponseCodes.BAD_REQUEST,
               data: {},
-              message: "Booking has no Eeceiver",
+              message: GetMessages("Booking.NoReceiver", lang),
               error: "",
             });
           } else if (!bookingDetails.isReceiverReady) {
             return res.badRequest({
               status: ResponseCodes.BAD_REQUEST,
               data: {},
-              message: "Receiver is not ready to Receive",
+              message: GetMessages("Receiver.NotReady", lang),
               error: "",
             });
           }
@@ -613,7 +633,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "This Booking is already booked",
+            message: GetMessages("Booking.AlreadyBooked", lang),
             error: "",
           });
         }
@@ -637,7 +657,7 @@ module.exports = {
             return res.badRequest({
               status: ResponseCodes.BAD_REQUEST,
               data: {},
-              message: "Trip does not have enough Capacity",
+              message: GetMessages("Trip.CapacityExceed", lang),
               error: "",
             });
           }
@@ -725,7 +745,7 @@ module.exports = {
         //sending OK response
         return res.ok({
           status: ResponseCodes.OK,
-          message: "Your Request is Approved",
+          message: GetMessages("PickRequest.Approve", lang),
           error: "",
         });
       }
@@ -736,7 +756,7 @@ module.exports = {
         return res.badRequest({
           status: ResponseCodes.BAD_REQUEST,
           data: {},
-          message: "Database Error",
+          message: GetMessages("Database.Error", lang),
           error: error.toString(),
         });
       } else {
@@ -792,7 +812,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "Pick Request Not Found",
+            message: GetMessages("PickRequest.NotFound", lang),
             error: "",
           });
         }
@@ -801,7 +821,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "You can not change after the request is Approved",
+            message: GetMessages("PickRequest.AlreadyApproved", lang),
             error: "",
           });
         }
@@ -819,7 +839,7 @@ module.exports = {
           //sending OK response
           return res.ok({
             status: ResponseCodes.OK,
-            message: "Pick Request Deleted Successfully",
+            message: GetMessages("PickRequest.Delete", lang),
             error: "",
           });
         } else if (pickRequest.requestTo === req.me.id) {
@@ -836,7 +856,7 @@ module.exports = {
           //sending OK response
           return res.ok({
             status: ResponseCodes.OK,
-            message: "Pick Request is Rejected Successfully",
+            message: GetMessages("PickRequest.Reject", lang),
             error: "",
           });
         }
