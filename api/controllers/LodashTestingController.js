@@ -153,8 +153,22 @@ module.exports = {
       //   new google.maps.LatLng(latitude1, longitude1),
       //   new google.maps.LatLng(latitude2, longitude2)
       // );
+      // let distance = require("google-distance");
+      // let dist;
+      // distance.get(
+      //   {
+      //     origin: "San Francisco, CA",
+      //     destination: "San Diego, CA",
+      //   },
+      //   function (err, data) {
+      //     if (err) return console.log(err);
+      //     console.log(data);
+      //     dist = data;
+      //   }
+      // );
       return res.json({
         message: "successful!",
+        // distance: dist,
         data: response / 1000,
       });
     } catch (error) {
