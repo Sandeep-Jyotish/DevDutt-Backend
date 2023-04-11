@@ -136,7 +136,7 @@ module.exports = {
             startingPoint: startingPoint,
             endingPoint: endingPoint,
             expStartTime: { ">=": unixStartTime },
-            expEndTime: { "<=": unixEndTime },
+            expEndTime: { ">=": unixEndTime },
             // myself: false,
             isDeleted: false,
           };
@@ -156,7 +156,6 @@ module.exports = {
             where: where,
             sort: "expStartTime DESC",
           };
-          console.log(bookingObj);
           // find boookings and user
           let bookings = await Booking.find(bookingObj).populate("bookingBy");
           if (bookings.length > 0) {

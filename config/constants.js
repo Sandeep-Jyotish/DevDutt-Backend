@@ -49,10 +49,10 @@ const VehicleBasePrice = {
   ForBike: 2,
   ForAuto: 3,
   ForCar: 4,
-  ForBus: 5,
-  ForTrain: 6,
-  ForFlight: 7,
-  ForShip: 8,
+  ForBus: 1,
+  ForTrain: 0.05,
+  ForFlight: 0.5,
+  ForShip: 0.03,
 };
 
 const weightType = {

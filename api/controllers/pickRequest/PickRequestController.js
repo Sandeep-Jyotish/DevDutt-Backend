@@ -146,10 +146,10 @@ module.exports = {
           // set weight
           let weight = bookingDetails.weight;
           if (bookingDetails.weightType === weightType.KiloGram) {
-            weight = weight / 1000;
+            weight = weight * 1000;
           }
           // calculate value of Item when weight is available
-          switch (weight) {
+          switch (true) {
             case weight <= 500: {
               valueOfItem = 1;
               break;
@@ -160,6 +160,10 @@ module.exports = {
             }
             case weight > 1000 && weight <= 1500: {
               valueOfItem = 3;
+              break;
+            }
+            case weight > 1500: {
+              valueOfItem = 5;
               break;
             }
           }
