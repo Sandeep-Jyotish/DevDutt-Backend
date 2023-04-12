@@ -195,36 +195,44 @@ module.exports = {
               pickRequestDetails.bookingId.item !== null &&
               pickRequestDetails.bookingId.receiverId !== null
             ) {
-              // find the receiver details
-              let receiverDetails = await Receiver.findOne({
-                id: pickRequestDetails.bookingId.receiverId,
-                isDeleted: false,
-              });
-
-              if (receiverDetails) {
-                // when got the Receiver Details
-                // create OTP and update Receiver table
-                let updateReceiver = await Receiver.updateOne({
+              if (!pickRequestDetails.bookingId.isReached) {
+                // find the receiver details
+                let receiverDetails = await Receiver.findOne({
                   id: pickRequestDetails.bookingId.receiverId,
                   isDeleted: false,
-                }).set({
-                  otp: Math.floor(Math.random() * 9000 + 1000),
-                  updatedAt: Math.floor(Date.now() / 1000),
-                  updatedBy: req.me.id,
                 });
-                //sending OK response
-                return res.ok({
-                  status: ResponseCodes.OK,
-                  otp: updateReceiver.otp,
-                  message: "",
-                  error: "",
-                });
+
+                if (receiverDetails) {
+                  // when got the Receiver Details
+                  // create OTP and update Receiver table
+                  let updateReceiver = await Receiver.updateOne({
+                    id: pickRequestDetails.bookingId.receiverId,
+                    isDeleted: false,
+                  }).set({
+                    otp: Math.floor(Math.random() * 9000 + 1000),
+                    updatedAt: Math.floor(Date.now() / 1000),
+                    updatedBy: req.me.id,
+                  });
+                  //sending OK response
+                  return res.ok({
+                    status: ResponseCodes.OK,
+                    otp: updateReceiver.otp,
+                    message: "",
+                    error: "",
+                  });
+                } else {
+                  // return Error
+                  return res.badRequest({
+                    status: ResponseCodes.BAD_REQUEST,
+                    message: GetMessages("Receiver.NotFound", lang),
+                    error: "",
+                  });
+                }
               } else {
                 // return Error
                 return res.badRequest({
                   status: ResponseCodes.BAD_REQUEST,
-                  data: {},
-                  message: GetMessages("Receiver.NotFound", lang),
+                  message: GetMessages("Booking.Reached", lang),
                   error: "",
                 });
               }
@@ -233,7 +241,6 @@ module.exports = {
             // return Error
             return res.badRequest({
               status: ResponseCodes.BAD_REQUEST,
-              data: {},
               message: GetMessages("Otp.NotAllowedToSend", lang),
               error: "",
             });
@@ -242,7 +249,6 @@ module.exports = {
           // return Error
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
-            data: {},
             message: GetMessages("PickRequest.NotFound", lang),
             error: "",
           });
@@ -329,7 +335,6 @@ module.exports = {
                     // return Error
                     return res.badRequest({
                       status: ResponseCodes.BAD_REQUEST,
-                      data: {},
                       message: GetMessages("Otp.Wrong", lang),
                       error: "",
                     });
@@ -338,7 +343,6 @@ module.exports = {
                   // return Error
                   return res.badRequest({
                     status: ResponseCodes.BAD_REQUEST,
-                    data: {},
                     message: GetMessages("Receiver.NotFound", lang),
                     error: "",
                   });
@@ -347,7 +351,6 @@ module.exports = {
                 // return Error
                 return res.badRequest({
                   status: ResponseCodes.BAD_REQUEST,
-                  data: {},
                   message: GetMessages("Otp.Empty", lang),
                   error: "",
                 });
@@ -356,7 +359,6 @@ module.exports = {
               // return Error
               return res.badRequest({
                 status: ResponseCodes.BAD_REQUEST,
-                data: {},
                 message: GetMessages("Booking.Reached", lang),
                 error: "",
               });
@@ -365,7 +367,6 @@ module.exports = {
             // return Error
             return res.badRequest({
               status: ResponseCodes.BAD_REQUEST,
-              data: {},
               message: GetMessages("User.Invalid", lang),
               error: "",
             });
@@ -374,7 +375,6 @@ module.exports = {
           // return Error
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
-            data: {},
             message: GetMessages("PickRequest.NotFound", lang),
             error: "",
           });
