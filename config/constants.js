@@ -147,6 +147,7 @@ const ValidationRules = {
     picture: "string|max:128",
     phoneNo: "required|string",
     email: "required|email",
+    otp: "integer",
     bookingId: "string|max:40",
   },
 };

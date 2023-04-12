@@ -258,4 +258,136 @@ module.exports = {
       });
     }
   },
+  /**
+   * @description This method will check the OTP of receiver for receiving goods
+   * @method POST
+   * @param {Request} req
+   * @param {Response} res
+   * @returns HTTP Response
+   * @author Sandeep Jyotish (Zignuts)
+   */
+  confirmReceiverOTP: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
+    try {
+      let fields = ["otp", "id"];
+      // Validate the data
+      let result = await Receiver.validateBeforeCreateOrUpdate(
+        req.body,
+        fields
+      );
+      if (result.hasError) {
+        //if has any error in input field
+        return res.badRequest({
+          status: ResponseCodes.BAD_REQUEST,
+          data: {},
+          message: Object.keys(result.errors).length,
+          error: result.errors,
+        });
+      } else {
+        //current time
+        let currentTime = Math.floor(Date.now() / 1000);
+        let { otp, id } = result.data;
+
+        // find the pickRequest details
+        let pickRequestDetails = await PickRequest.findOne({
+          id: id,
+          isApproved: true,
+          isDeleted: false,
+        })
+          .populate("tripId")
+          .populate("bookingId");
+
+        if (pickRequestDetails) {
+          if (pickRequestDetails.tripId.tripBy === req.me.id) {
+            if (!pickRequestDetails.bookingId.isReached) {
+              if (!isEmpty(otp)) {
+                // find the receiver
+                let receiverDetails = await Receiver.findOne({
+                  id: pickRequestDetails.bookingId.receiverId,
+                  isDeleted: false,
+                });
+                if (receiverDetails) {
+                  if (receiverDetails.otp === Number(otp)) {
+                    // when OTP is matched
+                    // update the Booking with isReached true
+                    await Booking.updateOne({
+                      id: pickRequestDetails.bookingId.id,
+                      isDeleted: false,
+                    }).set({
+                      isReached: true,
+                      updatedAt: currentTime,
+                      updatedBy: req.me.id,
+                    });
+                    //sending OK response
+                    return res.ok({
+                      status: ResponseCodes.OK,
+                      message: GetMessages("Otp.Verified", lang),
+                      error: "",
+                    });
+                  } else {
+                    // return Error
+                    return res.badRequest({
+                      status: ResponseCodes.BAD_REQUEST,
+                      data: {},
+                      message: GetMessages("Otp.Wrong", lang),
+                      error: "",
+                    });
+                  }
+                } else {
+                  // return Error
+                  return res.badRequest({
+                    status: ResponseCodes.BAD_REQUEST,
+                    data: {},
+                    message: GetMessages("Receiver.NotFound", lang),
+                    error: "",
+                  });
+                }
+              } else {
+                // return Error
+                return res.badRequest({
+                  status: ResponseCodes.BAD_REQUEST,
+                  data: {},
+                  message: GetMessages("Otp.Empty", lang),
+                  error: "",
+                });
+              }
+            } else {
+              // return Error
+              return res.badRequest({
+                status: ResponseCodes.BAD_REQUEST,
+                data: {},
+                message: GetMessages("Booking.Reached", lang),
+                error: "",
+              });
+            }
+          } else {
+            // return Error
+            return res.badRequest({
+              status: ResponseCodes.BAD_REQUEST,
+              data: {},
+              message: GetMessages("User.Invalid", lang),
+              error: "",
+            });
+          }
+        } else {
+          // return Error
+          return res.badRequest({
+            status: ResponseCodes.BAD_REQUEST,
+            data: {},
+            message: GetMessages("PickRequest.NotFound", lang),
+            error: "",
+          });
+        }
+      }
+    } catch (error) {
+      //return error
+      return res.serverError({
+        status: ResponseCodes.SERVER_ERROR,
+        data: {},
+        message: "",
+        error: error.toString(),
+      });
+    }
+  },
 };

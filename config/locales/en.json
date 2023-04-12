@@ -4,6 +4,8 @@
 
   "Database.Error": "Database Error",
 
+  "User.Invalid": "Invalid User",
+
   "User.AlreadyExist": "User already Exists on that Email",
   "User.PasswordMissMatched": "Incorrect PAssword",
   "User.WrongPassword": "Wrong Password",
@@ -23,6 +25,7 @@
   "Booking.AlreadyApproved": "Your Booking is Already Approved",
   "Booking.NoReceiver": "Booking has no Receiver",
   "Booking.AlreadyBooked": "This Booking is already booked",
+  "Booking.Reached": "This Booking has been reached",
 
   "Receiver.NotFound": "Receiver Not Found",
   "Receiver.NotReady": "Receiver is not ready to Receive",
@@ -56,5 +59,6 @@
   "Otp.NotAllowedToSend": "You are not allowed to Send OTP",
   "Otp.Wrong": "You entered Wrong OTP",
   "Otp.NotAllowedToVerify": "You are not allowed to verify",
-  "Otp.Verified": "OTP is matched and verified"
+  "Otp.Verified": "OTP is matched and verified",
+  "Otp.Empty": "Please Enter the OTP"
 }

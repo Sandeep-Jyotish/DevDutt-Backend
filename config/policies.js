@@ -39,7 +39,8 @@ module.exports.policies = {
   },
 
   "booking/ReceiverController": {
-    getReceiverOTP: "hasUserToken",
+    sendReceiverOTP: "hasUserToken",
+    confirmReceiverOTP: "hasUserToken",
   },
 
   "pickRequest/PickRequestController": {
