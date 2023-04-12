@@ -38,6 +38,10 @@ module.exports.policies = {
     relatedBookings: "hasUserToken",
   },
 
+  "booking/ReceiverController": {
+    getReceiverOTP: "hasUserToken",
+  },
+
   "pickRequest/PickRequestController": {
     getById: "hasUserToken",
     create: "hasUserToken",

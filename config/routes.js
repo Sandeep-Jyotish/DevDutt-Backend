@@ -76,6 +76,9 @@ module.exports.routes = {
   "POST /booking/get/related-bookings":
     "booking/BookingController.relatedBookings",
 
+  "POST /booking/send-receiver-otp":
+    "booking/ReceiverController.sendReceiverOTP",
+
   // PickRequest Controller
   "GET /pick-request/get/:id": "pickRequest/PickRequestController.getById",
   "POST /pick-request/create": "pickRequest/PickRequestController.create",

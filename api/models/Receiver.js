@@ -35,6 +35,11 @@ module.exports = {
       required: true,
       columnType: "varchar(20)",
     },
+    otp: {
+      type: "number",
+      allowNull: true,
+      columnType: "unit(11)",
+    },
     // Association start
     // Association with booking table
     bookingId: {

@@ -133,7 +133,7 @@ module.exports = {
         }
 
         // declare fare value
-        let fare;
+        let fare = 0;
 
         // item value calculation
         let valueOfItem = 0;
@@ -212,10 +212,11 @@ module.exports = {
             break;
           }
         }
+        let distance = 1800;
         //sending OK response
         return res.ok({
           status: ResponseCodes.OK,
-          fare: fare,
+          fare: fare * distance,
           message: "Your Fare",
           error: "",
         });

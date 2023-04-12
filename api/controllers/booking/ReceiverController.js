@@ -155,4 +155,107 @@ module.exports = {
       });
     }
   },
+  /**
+   * @description This method will send OTP to the receiver for varification
+   * @method POST
+   * @param {Request} req
+   * @param {Response} res
+   * @returns HTTP Response
+   * @author Sandeep Jyotish (Zignuts)
+   */
+  sendReceiverOTP: async function (req, res) {
+    //getting the language from locale
+    const lang = req.getLocale();
+    try {
+      let pickRequest = req.body.id;
+
+      if (isEmpty(pickRequest)) {
+        // return Error
+        return res.badRequest({
+          status: ResponseCodes.BAD_REQUEST,
+          data: {},
+          message: GetMessages("Enter Pick Request Id", lang),
+          error: "",
+        });
+      } else {
+        // find the Pick Request details
+        let pickRequestDetails = await PickRequest.findOne({
+          id: pickRequest,
+          isApproved: true,
+          isDeleted: false,
+        })
+          .populate("bookingId")
+          .populate("tripId");
+
+        if (pickRequestDetails) {
+          // If pickRequest found
+          // Check the Trip owner is the current user or not
+          if (pickRequestDetails.tripId.tripBy === req.me.id) {
+            if (
+              pickRequestDetails.bookingId.item !== null &&
+              pickRequestDetails.bookingId.receiverId !== null
+            ) {
+              // find the receiver details
+              let receiverDetails = await Receiver.findOne({
+                id: pickRequestDetails.bookingId.receiverId,
+                isDeleted: false,
+              });
+
+              if (receiverDetails) {
+                // when got the Receiver Details
+                // create OTP and update Receiver table
+                let updateReceiver = await Receiver.updateOne({
+                  id: pickRequestDetails.bookingId.receiverId,
+                  isDeleted: false,
+                }).set({
+                  otp: Math.floor(Math.random() * 9000 + 1000),
+                  updatedAt: Math.floor(Date.now() / 1000),
+                  updatedBy: req.me.id,
+                });
+                //sending OK response
+                return res.ok({
+                  status: ResponseCodes.OK,
+                  otp: updateReceiver.otp,
+                  message: "",
+                  error: "",
+                });
+              } else {
+                // return Error
+                return res.badRequest({
+                  status: ResponseCodes.BAD_REQUEST,
+                  data: {},
+                  message: GetMessages("Receiver.NotFound", lang),
+                  error: "",
+                });
+              }
+            }
+          } else {
+            // return Error
+            return res.badRequest({
+              status: ResponseCodes.BAD_REQUEST,
+              data: {},
+              message: GetMessages("Otp.NotAllowedToSend", lang),
+              error: "",
+            });
+          }
+        } else {
+          // return Error
+          return res.badRequest({
+            status: ResponseCodes.BAD_REQUEST,
+            data: {},
+            message: GetMessages("PickRequest.NotFound", lang),
+            error: "",
+          });
+        }
+      }
+    } catch (error) {
+      //return error
+      return res.serverError({
+        status: ResponseCodes.SERVER_ERROR,
+        data: {},
+        message: "",
+        error: error.toString(),
+      });
+    }
+  },
 };

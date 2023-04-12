@@ -141,8 +141,8 @@ module.exports = {
     try {
       const SphericalUtil = require("node-geometry-library");
       let response = SphericalUtil.SphericalUtil.computeDistanceBetween(
-        { lat: 23.055238445144024, lng: 72.54887355427091 }, //from object {lat, lng}
-        { lat: 23.198095596678552, lng: 72.62318632895979 } // to object {lat, lng}
+        { lat: 21.1783895374338, lng: 72.83327906799516 }, //from object {lat, lng}
+        { lat: 23.03279681745682, lng: 72.56462248704821 } // to object {lat, lng}
       );
       // var latitude1 = 39.46;
       // var longitude1 = -0.36;

@@ -53,6 +53,7 @@
   "PickRequest.NotApproved": "Your Request is not Approved",
 
   "Otp.NotAllowedToGet": "You are not allowed to get OTP",
+  "Otp.NotAllowedToSend": "You are not allowed to Send OTP",
   "Otp.Wrong": "You entered Wrong OTP",
   "Otp.NotAllowedToVerify": "You are not allowed to verify",
   "Otp.Verified": "OTP is matched and verified"
