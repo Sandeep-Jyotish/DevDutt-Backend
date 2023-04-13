@@ -139,7 +139,6 @@ module.exports = {
           // return Error
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
-            data: {},
             message: GetMessages("Booking.NotFound", lang),
             error: "",
           });

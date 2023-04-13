@@ -103,6 +103,9 @@ module.exports.routes = {
   "POST /receiver/confirm-receiver":
     "booking/ReceiverController.confirmReceiver",
 
+  // File Uploading Controller
+  "POST /file/upload-file": "file/FileController.uploadFile",
+
   // Paymetn Razorpay
   "POST /razorpay/payment": "PaymentController.razorpayTest",
   /***************************************************************************

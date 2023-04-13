@@ -394,7 +394,7 @@ module.exports = {
         return res.badRequest({
           status: ResponseCodes.BAD_REQUEST,
           data: {},
-          message: "Database Error",
+          message: GetMessages("Database.Error", lang),
           error: error.toString(),
         });
       } else {
@@ -860,7 +860,7 @@ module.exports = {
         //sending OK response
         return res.ok({
           status: ResponseCodes.OK,
-          message: "Booking Deleted Successfully",
+          message: GetMessages("Booking.Delete", lang),
           error: "",
         });
       }

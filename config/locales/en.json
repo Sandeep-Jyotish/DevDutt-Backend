@@ -26,6 +26,7 @@
   "Booking.NoReceiver": "Booking has no Receiver",
   "Booking.AlreadyBooked": "This Booking is already booked",
   "Booking.Reached": "This Booking has been reached",
+  "Booking.Delete": "Booking Deleted Successfully",
 
   "Receiver.NotFound": "Receiver Not Found",
   "Receiver.NotReady": "Receiver is not ready to Receive",
@@ -60,5 +61,8 @@
   "Otp.Wrong": "You entered Wrong OTP",
   "Otp.NotAllowedToVerify": "You are not allowed to verify",
   "Otp.Verified": "OTP is matched and verified",
-  "Otp.Empty": "Please Enter the OTP"
+  "Otp.Empty": "Please Enter the OTP",
+
+  "File.Upload": "File Uploaded Successfully",
+  "File.UploadError": "Error in File uploading"
 }

@@ -174,6 +174,12 @@ function isEmpty(val) {
     : false;
 }
 
+// file Type
+const FileType = {
+  Video: "Video",
+  Image: "Image",
+};
+
 // Razorpay intigration
 const razorPay = require("razorpay");
 const razorPayInstance = new razorPay({
@@ -197,4 +203,5 @@ module.exports.constants = {
   weightType,
   requestType,
   VehicleBasePrice,
+  FileType,
 };
