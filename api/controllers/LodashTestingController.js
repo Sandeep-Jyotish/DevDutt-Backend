@@ -5,7 +5,7 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 const _ = require("lodash");
-const { Path, isEmpty } = sails.config.constants;
+const { Path, isEmpty, Axios, Fetch } = sails.config.constants;
 const file = require("/home/zt63/demostripe/config/test.json");
 
 module.exports = {
@@ -139,11 +139,55 @@ module.exports = {
   },
   map: async function (req, res) {
     try {
-      const SphericalUtil = require("node-geometry-library");
-      let response = SphericalUtil.SphericalUtil.computeDistanceBetween(
-        { lat: 21.1783895374338, lng: 72.83327906799516 }, //from object {lat, lng}
-        { lat: 23.03279681745682, lng: 72.56462248704821 } // to object {lat, lng}
-      );
+      let address1 = req.body.from;
+      let address2 = req.body.to;
+
+      async function getLocation(address) {
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+          address
+        )}&format=json`;
+
+        const response = await Axios.get(url);
+        const result = response.data[0];
+
+        if (!result) {
+          throw new Error(`Could not find location for address "${address}"`);
+        }
+
+        return {
+          latitude: parseFloat(result.lat),
+          longitude: parseFloat(result.lon),
+        };
+      }
+
+      // const location1 = await getLocation(address1);
+      // const location2 = await getLocation(address2);
+      const location1 = "21.371521698971804,84.71333565614415";
+      const location2 = "20.295904043847365,85.81956377698508";
+      // let distance = 0;
+      // let arr1 = [location1.latitude, location1.longitude];
+      // let arr2 = [location2.latitude, location2.longitude];
+      // console.log(arr1);
+
+      // let data;
+      await Fetch(
+        `https://api.geoapify.com/v1/routing?waypoints=${location1}|${location2}&mode=drive&apiKey=${process.env.GEOAPIFY_KEY}`
+      )
+        .then((response) => response.json())
+        .then((result) => {
+          data = result;
+        })
+        .catch((error) => {
+          throw error;
+        });
+      // console.log(data);
+      // const data = await response.json();
+
+      // const SphericalUtil = require("node-geometry-library");
+      // let response = SphericalUtil.SphericalUtil.computeDistanceBetween(
+      //   { lat: 21.1783895374338, lng: 72.83327906799516 }, //from object {lat, lng}
+      //   { lat: 23.03279681745682, lng: 72.56462248704821 } // to object {lat, lng}
+      // );
       // var latitude1 = 39.46;
       // var longitude1 = -0.36;
       // var latitude2 = 40.4;
@@ -169,7 +213,8 @@ module.exports = {
       return res.json({
         message: "successful!",
         // distance: dist,
-        data: response / 1000,
+        // data: distance / 1000,
+        data: data.features[0].properties.distance / 1000,
       });
     } catch (error) {
       return res.serverError({

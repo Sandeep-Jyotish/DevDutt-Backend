@@ -31,6 +31,13 @@ const CustomValidationMsg = {
 const passwordRegex =
   /(?=^.{8,}$)(?=.*\d)(?=.*[~()_+='":;?/|.><,`}{!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
 
+const AWS = require("aws-sdk");
+
+const Axios = require("axios");
+
+const Fetch = require("node-fetch");
+require("dotenv").config();
+const Path = require("path");
 // vehicle Type
 const VehicleType = {
   Cycle: "Cycle",
@@ -41,18 +48,6 @@ const VehicleType = {
   Train: "Train",
   Flight: "Flight",
   Ship: "Ship",
-};
-
-// Vehicle wise Base Price
-const VehicleBasePrice = {
-  ForCycle: 1,
-  ForBike: 2,
-  ForAuto: 3,
-  ForCar: 4,
-  ForBus: 1,
-  ForTrain: 0.05,
-  ForFlight: 0.5,
-  ForShip: 0.03,
 };
 
 const weightType = {
@@ -161,9 +156,31 @@ deeplink({
     "https://itunes.apple.com/us/app/cups-unlimited-coffee/id556462755?mt=8&uo=4",
 });
 
-const AWS = require("aws-sdk");
-require("dotenv").config();
-const Path = require("path");
+// Vehicle wise Base Price
+const VehicleBasePrice = {
+  ForCycle: 1,
+  ForBike: 2,
+  ForAuto: 2,
+  ForCar: 3,
+  ForBus: 1,
+  ForTrain: 0.05,
+  ForFlight: 0.5,
+  ForShip: 0.03,
+};
+
+// Drive Mode
+const DriveMode = {
+  Drive: "drive",
+  LightTruch: "light_truck",
+  MediumTruck: "medium_truck",
+  Truck: "truck",
+  Bus: "bus",
+  Motorcycle: "motorcycle",
+  Scooter: "scooter",
+  Bicycle: "bicycle",
+  Walk: "walk",
+};
+
 function isEmpty(val) {
   return !val ||
     val === undefined ||
@@ -198,10 +215,13 @@ module.exports.constants = {
   Validator,
   Bcrypt,
   JWT,
+  Axios,
   razorPayInstance,
   VehicleType,
   weightType,
   requestType,
   VehicleBasePrice,
   FileType,
+  DriveMode,
+  Fetch,
 };

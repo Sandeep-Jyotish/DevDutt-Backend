@@ -63,6 +63,8 @@
   "Otp.Verified": "OTP is matched and verified",
   "Otp.Empty": "Please Enter the OTP",
 
+  "Fare.CalculationError": "Fare calculation Error",
+
   "File.Upload": "File Uploaded Successfully",
   "File.UploadError": "Error in File uploading"
 }

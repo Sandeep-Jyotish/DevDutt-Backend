@@ -4,8 +4,16 @@
  * @description :: Server-side actions for handling incoming requests.
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
-const { ResponseCodes, isEmpty, VehicleType, weightType, VehicleBasePrice } =
-  sails.config.constants;
+const {
+  ResponseCodes,
+  isEmpty,
+  VehicleType,
+  weightType,
+  DriveMode,
+  VehicleBasePrice,
+  Axios,
+  Fetch,
+} = sails.config.constants;
 const GetMessages = sails.config.getMessages;
 module.exports = {
   /**
@@ -132,94 +140,34 @@ module.exports = {
           });
         }
 
-        // declare fare value
-        let fare = 0;
-
-        // item value calculation
-        let valueOfItem = 0;
-        // calculate valueOfItem for person
-        if (bookingDetails.myself) {
-          valueOfItem = 2;
+        // set data to send fareCalculate helper
+        let dataToHelper = {
+          myself: bookingDetails.myself ? true : false,
+          item: bookingDetails.item,
+          bookingWeight: bookingDetails.weight,
+          bookingWeightType: bookingDetails.weightType,
+          vehicleType: tripDetails.vehicleType,
+          startingPoint: bookingDetails.startingPoint,
+          endingPoint: bookingDetails.endingPoint,
+        };
+        let fare = await sails.helpers.fare.fareCalculate.with(dataToHelper);
+        if (fare) {
+          //sending OK response
+          return res.ok({
+            status: ResponseCodes.OK,
+            fare: fare,
+            message: "Your Fare",
+            error: "",
+          });
+        } else {
+          //return error
+          return res.badRequest({
+            status: ResponseCodes.BAD_REQUEST,
+            data: {},
+            message: GetMessages("Fare.CalculationError", lang),
+            error: "",
+          });
         }
-        // if Booking is for send Item
-        if (bookingDetails.item !== null) {
-          // set weight
-          let weight = bookingDetails.weight;
-          if (bookingDetails.weightType === weightType.KiloGram) {
-            weight = weight * 1000;
-          }
-          // calculate value of Item when weight is available
-          switch (true) {
-            case weight <= 500: {
-              valueOfItem = 1;
-              break;
-            }
-            case weight > 500 && weight <= 1000: {
-              valueOfItem = 2;
-              break;
-            }
-            case weight > 1000 && weight <= 1500: {
-              valueOfItem = 3;
-              break;
-            }
-            case weight > 1500: {
-              valueOfItem = 5;
-              break;
-            }
-          }
-        }
-
-        // Calculate Fare
-        switch (tripDetails.vehicleType) {
-          case VehicleType.Cycle: {
-            // fare calculation for vehicle Type Cycle
-            fare = VehicleBasePrice.ForCycle * valueOfItem;
-            break;
-          }
-          case VehicleType.Bike: {
-            // fare calculation for vehicle Type Bike
-            fare = VehicleBasePrice.ForBike * valueOfItem;
-            break;
-          }
-          case VehicleType.Auto: {
-            // fare calculation for vehicle Type Auto
-            fare = VehicleBasePrice.ForAuto * valueOfItem;
-            break;
-          }
-          case VehicleType.Car: {
-            // fare calculation for vehicle Type Car
-            fare = VehicleBasePrice.ForCar * valueOfItem;
-            break;
-          }
-          case VehicleType.Bus: {
-            // fare calculation for vehicle Type Bus
-            fare = VehicleBasePrice.ForBus * valueOfItem;
-            break;
-          }
-          case VehicleType.Train: {
-            // fare calculation for vehicle Type Train
-            fare = VehicleBasePrice.ForTrain * valueOfItem;
-            break;
-          }
-          case VehicleType.Flight: {
-            // fare calculation for vehicle Type Flight
-            fare = VehicleBasePrice.ForFlight * valueOfItem;
-            break;
-          }
-          case VehicleType.Ship: {
-            // fare calculation for vehicle Type Ship
-            fare = VehicleBasePrice.ForShip * valueOfItem;
-            break;
-          }
-        }
-        let distance = 1800;
-        //sending OK response
-        return res.ok({
-          status: ResponseCodes.OK,
-          fare: fare * distance,
-          message: "Your Fare",
-          error: "",
-        });
       }
     } catch (error) {
       //return error

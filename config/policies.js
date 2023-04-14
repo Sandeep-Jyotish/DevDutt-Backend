@@ -46,7 +46,7 @@ module.exports.policies = {
   "pickRequest/PickRequestController": {
     getById: "hasUserToken",
     create: "hasUserToken",
-    update: "hasUserToken",
+    // update: "hasUserToken",
     getTripRequests: "hasUserToken",
     getBookingRequests: "hasUserToken",
     approve: "hasUserToken",
