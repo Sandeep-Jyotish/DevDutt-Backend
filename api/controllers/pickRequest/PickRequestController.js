@@ -143,13 +143,16 @@ module.exports = {
         // set data to send fareCalculate helper
         let dataToHelper = {
           myself: bookingDetails.myself ? true : false,
-          item: bookingDetails.item,
-          bookingWeight: bookingDetails.weight,
-          bookingWeightType: bookingDetails.weightType,
           vehicleType: tripDetails.vehicleType,
           startingPoint: bookingDetails.startingPoint,
           endingPoint: bookingDetails.endingPoint,
         };
+        if (bookingDetails.item !== null) {
+          dataToHelper.item = bookingDetails.item;
+          dataToHelper.bookingWeight = bookingDetails.weight;
+          dataToHelper.bookingWeightType = bookingDetails.weightType;
+        }
+        // console.log(dataToHelper);
         let fare = await sails.helpers.fare.fareCalculate.with(dataToHelper);
         if (fare) {
           //sending OK response

@@ -31,7 +31,7 @@ module.exports = {
       isIn: [weightType.Gram, weightType.KiloGram],
     },
     weight: {
-      type: "number",
+      type: "float",
       allowNull: true,
       columnType: "BigInt(20)",
     },

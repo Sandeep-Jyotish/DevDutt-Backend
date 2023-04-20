@@ -62,7 +62,7 @@ module.exports = {
       isIn: [weightType.Gram, weightType.KiloGram],
     },
     weightCapacity: {
-      type: "number",
+      type: "float",
       required: true,
       columnType: "float",
     },

@@ -129,7 +129,7 @@ const ValidationRules = {
   },
   PickRequest: {
     id: "required|string|max:40",
-    fare: "required|integer|min:0",
+    fare: "required|min:0",
     tripId: "required|string|max:40",
     bookingId: "required|string|max:40",
     otp: "integer",
@@ -160,8 +160,8 @@ deeplink({
 const VehicleBasePrice = {
   ForCycle: 1,
   ForBike: 2,
-  ForAuto: 2,
-  ForCar: 3,
+  ForAuto: 0.8,
+  ForCar: 1,
   ForBus: 1,
   ForTrain: 0.05,
   ForFlight: 0.5,

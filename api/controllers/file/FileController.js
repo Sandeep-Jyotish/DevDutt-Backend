@@ -77,4 +77,32 @@ module.exports = {
       });
     }
   },
+  imageSize: async function (req, res) {
+    try {
+      const Jimp = require("jimp");
+
+      // URL of the image to get the dimensions of
+      const imageUrl =
+        "https://t4.ftcdn.net/jpg/03/17/25/45/240_F_317254576_lKDALRrvGoBr7gQSa1k4kJBx7O2D15dc.jpg";
+
+      // Read the image from the URL and get its dimensions
+      Jimp.read(imageUrl)
+        .then((image) => {
+          console.log(
+            `Image dimensions: ${image.bitmap.width} x ${image.bitmap.height}`
+          );
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    } catch (error) {
+      //return error
+      return res.serverError({
+        status: ResponseCodes.SERVER_ERROR,
+        data: {},
+        message: "",
+        error: error.toString(),
+      });
+    }
+  },
 };
