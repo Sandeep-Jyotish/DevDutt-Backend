@@ -153,6 +153,7 @@ module.exports = {
           dataToHelper.bookingWeightType = bookingDetails.weightType;
         }
         // console.log(dataToHelper);
+        // call helper to calculate the fare with distance
         let fare = await sails.helpers.fare.fareCalculate.with(dataToHelper);
         if (fare) {
           //sending OK response
@@ -231,7 +232,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "No Booking Found on that Id",
+            message: GetMessages("Booking.NotFound", lang),
             error: "",
           });
         }
@@ -247,7 +248,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "No Trip Found on that Id",
+            message: GetMessages("Trip.NotFound", lang),
             error: "",
           });
         }
@@ -256,7 +257,7 @@ module.exports = {
           return res.badRequest({
             status: ResponseCodes.BAD_REQUEST,
             data: {},
-            message: "You Can not Book Your Own Trip on Booking",
+            message: GetMessages("PickRequest.SameTrip", lang),
             error: "",
           });
         }

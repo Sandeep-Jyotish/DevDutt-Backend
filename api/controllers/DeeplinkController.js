@@ -9,7 +9,7 @@
 var admin = require("firebase-admin");
 var FCM = require("fcm-node");
 const FS = require("fs");
-var serviceAccount = require("./serviceAccountKey.json");
+var serviceAccount = require("/home/zt63/devdutt-backend/config/serviceAccountKey.json");
 const Firebase = require("firebase/app");
 const { sendPasswordResetEmail, getAuth } = require("firebase/auth");
 require("firebase/auth");
