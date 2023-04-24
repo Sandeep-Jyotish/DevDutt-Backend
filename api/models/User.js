@@ -100,7 +100,7 @@ module.exports = {
             return proceed(err);
           }
           valueToset.password = encryptedPassword;
-          console.log(valueToset);
+          // console.log(valueToset);
           proceed();
         }
       );

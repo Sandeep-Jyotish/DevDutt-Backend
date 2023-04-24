@@ -5,7 +5,8 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 const _ = require("lodash");
-const { Path, isEmpty, Axios, Fetch, FS } = sails.config.constants;
+const { Path, ResponseCodes, isEmpty, Axios, Fetch, FS } =
+  sails.config.constants;
 const file = require("/home/zt63/demostripe/config/test.json");
 const { log } = require("handlebars");
 
@@ -14,7 +15,7 @@ module.exports = {
     try {
       let object = { a: [{ b: { c: [1, 2, 3, 4] } }] };
       let result = _.invoke(object, "a[0].b.c.slice", 1, 4);
-      console.log(result);
+      // console.log(result);
       return res.json({
         message: "successful!",
         data: result,
@@ -30,7 +31,7 @@ module.exports = {
       //   let object = { a: 1, b: "2", c: 3 };
       let result = _.pick(req.body, ["b", "c"]);
 
-      console.log(result);
+      // console.log(result);
       return res.json({
         message: "successful!",
         data: result,
@@ -45,7 +46,7 @@ module.exports = {
     try {
       //   let object = { a: 1, b: "2", c: 3 };
       let result = _.omit(req.body, ["a"]);
-      console.log(result);
+      // console.log(result);
       function isEmpty(val) {
         process.nextTick(() => {
           console.log("Running at next tick => number 2");
@@ -242,14 +243,27 @@ module.exports = {
 
         FS.createReadStream(path)
           .pipe(csv())
-          .on("data", (data) => {
+          .on("data", async (data) => {
             if (
               !isEmpty(data.phoneNo) &&
               !isEmpty(data.email) &&
               !isEmpty(data.firstName) &&
               !isEmpty(data.lastName)
             ) {
-              results.push(data);
+              let field = [
+                "firstName",
+                "lastName",
+                "picture",
+                "email",
+                "phoneNo",
+                "password",
+                "confirmPassword",
+              ];
+              // Validate the data
+              let result = await User.validateBeforeCreateOrUpdate(data, field);
+              if (!result.hasError) {
+                results.push(data);
+              }
             }
           })
           .on("end", async () => {
@@ -258,7 +272,7 @@ module.exports = {
 
             // Fetch all the corresponding users in a single query
             let users = await User.find({ email: { in: emailAddresses } });
-
+            let currentTime = Math.floor(Date.now() / 1000);
             // Iterate over the results and push the elements that meet the condition
             results.forEach((ele) => {
               // Find the user corresponding to the email address
@@ -266,18 +280,23 @@ module.exports = {
 
               // Condition to delete element
               if (!user) {
-                ele.id = sails.config.constants.UUID();
-                ele.createdAt = Math.floor(Date.now() / 1000);
+                let id = sails.config.constants.UUID();
+                ele.id = id;
+                ele.createdAt = currentTime;
+                ele.createdBy = id;
+                ele.updatedAt = currentTime;
+                ele.updatedBy = id;
+                // console.log(ele);
                 dataToStore.push(ele);
               }
             });
 
             // delete the uploaded csv file
             await FS.unlinkSync(path);
-
+            let createUsers = await User.createEach(dataToStore).fetch();
             // Success Response
             return res.ok({
-              data: dataToStore,
+              data: createUsers,
             });
           });
       } else {
