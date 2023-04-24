@@ -46,6 +46,7 @@ module.exports.routes = {
   "POST /lodash/testing/omit": "LodashTestingController.omitTest",
   "POST /jsonTest": "LodashTestingController.jsonTest",
   "POST /lodash/testing/map": "LodashTestingController.map",
+  "POST /csv/testing/csv": "LodashTestingController.csv",
 
   /** DevDutt Project Routs start Here... */
   //User Controller

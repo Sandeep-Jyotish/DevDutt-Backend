@@ -5,8 +5,9 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 const _ = require("lodash");
-const { Path, isEmpty, Axios, Fetch } = sails.config.constants;
+const { Path, isEmpty, Axios, Fetch, FS } = sails.config.constants;
 const file = require("/home/zt63/demostripe/config/test.json");
+const { log } = require("handlebars");
 
 module.exports = {
   invokeTest: async function (req, res) {
@@ -216,6 +217,78 @@ module.exports = {
         // data: distance / 1000,
         data: data.features[0].properties.distance / 1000,
       });
+    } catch (error) {
+      return res.serverError({
+        error: error,
+      });
+    }
+  },
+  csv: async function (req, res) {
+    try {
+      //   get the file and details
+      let file = req.file("file");
+      const csv = require("csv-parser");
+      if (!isEmpty(file)) {
+        let results = [];
+        let dataToStore = [];
+
+        // let fileObject = {
+        //   dirname: dirname,
+        //   maxBytes: 90000000,
+        // };
+        //   Upload the file
+        let fileDetails = await sails.uploadOne(file);
+        let path = fileDetails.fd;
+
+        FS.createReadStream(path)
+          .pipe(csv())
+          .on("data", (data) => {
+            if (
+              !isEmpty(data.phoneNo) &&
+              !isEmpty(data.email) &&
+              !isEmpty(data.firstName) &&
+              !isEmpty(data.lastName)
+            ) {
+              results.push(data);
+            }
+          })
+          .on("end", async () => {
+            // Collect all the email addresses that need to be processed
+            let emailAddresses = results.map((ele) => ele.email);
+
+            // Fetch all the corresponding users in a single query
+            let users = await User.find({ email: { in: emailAddresses } });
+
+            // Iterate over the results and push the elements that meet the condition
+            results.forEach((ele) => {
+              // Find the user corresponding to the email address
+              let user = users.find((u) => u.email === ele.email);
+
+              // Condition to delete element
+              if (!user) {
+                ele.id = sails.config.constants.UUID();
+                ele.createdAt = Math.floor(Date.now() / 1000);
+                dataToStore.push(ele);
+              }
+            });
+
+            // delete the uploaded csv file
+            await FS.unlinkSync(path);
+
+            // Success Response
+            return res.ok({
+              data: dataToStore,
+            });
+          });
+      } else {
+        // Send Error
+        return res.badRequest({
+          status: ResponseCodes.BAD_REQUEST,
+          data: {},
+          message: GetMessages("Choose your csv file"),
+          error: "",
+        });
+      }
     } catch (error) {
       return res.serverError({
         error: error,

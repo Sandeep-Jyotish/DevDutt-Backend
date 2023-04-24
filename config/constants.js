@@ -11,6 +11,8 @@ const ResponseCodes = {
 };
 // for field validation
 const Validator = require("validatorjs");
+
+const FS = require("fs");
 // for uuid generation
 const { v4: uuidv4 } = require("uuid");
 
@@ -207,6 +209,7 @@ const razorPayInstance = new razorPay({
 module.exports.constants = {
   ResponseCodes,
   UUID: uuidv4,
+  FS,
   AWS,
   Path,
   isEmpty,

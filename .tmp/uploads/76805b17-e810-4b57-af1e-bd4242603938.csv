@@ -1,0 +1,8 @@
+firstName,lastName,email,phoneNo
+Sandeep,Kumar,sandeep@gmail.com,8989898989
+krunal,Chaudhary,krunalc@gmail.com,9898989898
+,swain,abhijit@gmail.com,1212121212
+Abhijit,,abhijit@gmail.com,1212121212
+Abhijit,swain,,1212121212
+Abhijit,swain,abhijit@gmail.com,
+Abhijit,swain,abhijit@gmail.com,1212121212
