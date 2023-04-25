@@ -111,6 +111,7 @@ module.exports.routes = {
   "POST /admin/create": "admin/AdminUserController.create",
   "POST /admin/update": "admin/AdminUserController.update",
   "POST /admin/login": "admin/AuthController.login",
+  "POST /admin/logout": "admin/AuthController.logout",
 
   // Paymetn Razorpay
   "POST /razorpay/payment": "PaymentController.razorpayTest",

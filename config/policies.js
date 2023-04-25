@@ -18,6 +18,9 @@ module.exports.policies = {
   "admin/AdminUserController": {
     update: "hasAdminToken",
   },
+  "admin/AuthController": {
+    logout: "hasAdminToken",
+  },
   "user/UserController": {
     update: "hasUserToken",
   },

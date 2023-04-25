@@ -227,6 +227,19 @@ const razorPayInstance = new razorPay({
   key_secret: "utMBllnE0NbzCjY2Q7RbrReJ",
 });
 
+// mail sending
+let nodeMailer = require("nodemailer");
+
+// setup SMTP for nodeMailer
+const Transport = nodeMailer.createTransport({
+  host: "sandbox.smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: "d94bddd265db1f",
+    pass: "66bbe0457dbb90",
+  },
+});
+
 module.exports.constants = {
   ResponseCodes,
   UUID: uuidv4,
@@ -248,4 +261,5 @@ module.exports.constants = {
   FileType,
   DriveMode,
   Fetch,
+  Transport,
 };
