@@ -4,8 +4,19 @@
 
   "Database.Error": "Database Error",
 
-  "User.Invalid": "Invalid User",
+  "Admin.NotFound": "Admin Not Found",
+  "Admin.Invalid": "Invalid Admin User",
+  "Admin.AlreadyExist": "Admin already Exists on that Email",
+  "Admin.PasswordMissMatched": "Incorrect PAssword",
+  "Admin.WrongPassword": "Wrong Password",
+  "Admin.Created": "Admin User Created Successfully",
+  "Admin.AuthTokenError": "Auth Token Could Not Generated",
+  "Admin.LogOut": "You are Successfully Logged Out",
+  "Admin.LogOutError": "Something went Wrong on Log out",
+  "Admin.LoggedinSuccessfully": "Password Matched & You are now Logged In",
 
+  "User.NotFound": "User Not Found",
+  "User.Invalid": "Invalid User",
   "User.AlreadyExist": "User already Exists on that Email",
   "User.PasswordMissMatched": "Incorrect PAssword",
   "User.WrongPassword": "Wrong Password",

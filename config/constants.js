@@ -63,6 +63,27 @@ const requestType = {
 };
 //Validation Rules
 const ValidationRules = {
+  Admin: {
+    firstName: "string|max:128",
+    lastName: "string|max:128",
+    picture: "string|max:128",
+    phoneNo: "string",
+    email: "email",
+    password: [
+      "required",
+      "string",
+      "min:8",
+      "max:32",
+      `regex:${passwordRegex}`,
+    ],
+    confirmPassword: [
+      "required",
+      "string",
+      "min:8",
+      "max:32",
+      `regex:${passwordRegex}`,
+    ],
+  },
   User: {
     firstName: "string|max:128",
     lastName: "string|max:128",

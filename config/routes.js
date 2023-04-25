@@ -107,6 +107,11 @@ module.exports.routes = {
   // File Uploading Controller
   "POST /file/upload-file": "file/FileController.uploadFile",
 
+  // Admin Controller
+  "POST /admin/create": "admin/AdminUserController.create",
+  "POST /admin/update": "admin/AdminUserController.update",
+  "POST /admin/login": "admin/AuthController.login",
+
   // Paymetn Razorpay
   "POST /razorpay/payment": "PaymentController.razorpayTest",
   /***************************************************************************

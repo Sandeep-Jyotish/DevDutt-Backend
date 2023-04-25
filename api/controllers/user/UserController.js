@@ -185,14 +185,7 @@ module.exports = {
         //find user on given id
         let user = await User.findOne({ where: { id: id, isDeleted: false } });
         if (user) {
-          let field = [
-            "firstName",
-            "lastName",
-            "picture",
-            "email",
-            "phoneNo",
-            "password",
-          ];
+          let field = ["firstName", "lastName", "picture", "email", "phoneNo"];
           // Validate the data
           let result = await User.validateBeforeCreateOrUpdate(req.body, field);
           if (result.hasError) {

@@ -15,6 +15,9 @@ module.exports.policies = {
    * (`true` allows public access)                                            *
    *                                                                          *
    ***************************************************************************/
+  "admin/AdminUserController": {
+    update: "hasAdminToken",
+  },
   "user/UserController": {
     update: "hasUserToken",
   },
