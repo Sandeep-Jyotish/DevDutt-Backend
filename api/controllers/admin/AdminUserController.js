@@ -107,9 +107,9 @@ module.exports = {
         let sendMailResult = await sails.helpers.mail.sendMail.with({
           mailType: "welcome",
           data: {
-            subject: "WELCOME TO DEVDUT",
+            subject: "Admin Created for DEVDUT.",
             email: user.email,
-            text: `welcome ${user.firstName}`,
+            text: `Hello ${user.firstName}, You are now Admin of our Devdut App`,
           },
           lang: lang,
         });

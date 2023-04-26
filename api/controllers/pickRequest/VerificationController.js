@@ -51,6 +51,16 @@ module.exports = {
             error: "",
           });
         }
+        // call sendMail helper to send mail
+        let sendMailResult = await sails.helpers.mail.sendMail.with({
+          mailType: "welcome",
+          data: {
+            subject: "OTP To Start Ride",
+            email: req.me.email,
+            text: `Hello ${req.me.firstName}, \n ${pickRequest.otp} is the OTP to start ride `,
+          },
+          lang: lang,
+        });
         //sending OK response
         return res.ok({
           status: ResponseCodes.OK,

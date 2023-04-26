@@ -212,6 +212,17 @@ module.exports = {
                     updatedAt: Math.floor(Date.now() / 1000),
                     updatedBy: req.me.id,
                   });
+
+                  // call sendMail helper to send mail
+                  let sendMailResult = await sails.helpers.mail.sendMail.with({
+                    mailType: "welcome",
+                    data: {
+                      subject: "OTP To Receive Item",
+                      email: updateReceiver.email,
+                      text: `Hello ${updateReceiver.firstName}, \n ${updateReceiver.otp} is the OTP to receive the Item ${pickRequestDetails.bookingId.item}`,
+                    },
+                    lang: lang,
+                  });
                   //sending OK response
                   return res.ok({
                     status: ResponseCodes.OK,

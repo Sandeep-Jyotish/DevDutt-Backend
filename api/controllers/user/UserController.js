@@ -103,6 +103,16 @@ module.exports = {
 
         //create the user
         let user = await User.create(dataToStore).fetch();
+        // call sendMail helper to send mail
+        let sendMailResult = await sails.helpers.mail.sendMail.with({
+          mailType: "welcome",
+          data: {
+            subject: "WELCOME TO DEVDUT",
+            email: user.email,
+            text: `Hello ${user.firstName}, become a Devdut for someone to help them And also there is someone who is ready to help you. So take the Advantages from Devdut`,
+          },
+          lang: lang,
+        });
         //send the response
         return res.ok({
           status: ResponseCodes.OK,
