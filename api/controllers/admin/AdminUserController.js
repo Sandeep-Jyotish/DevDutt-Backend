@@ -104,7 +104,7 @@ module.exports = {
         let user = await Admin.create(dataToStore).fetch();
 
         // call sendMail helper to send mail
-        let sendMailResult = await sails.helpers.mail.sendMail.with({
+        let sendMail = await sails.helpers.mail.sendMail.with({
           mailType: "welcome",
           data: {
             subject: "Admin Created for DEVDUT.",

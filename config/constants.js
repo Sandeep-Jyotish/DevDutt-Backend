@@ -223,8 +223,8 @@ const FileType = {
 // Razorpay intigration
 const razorPay = require("razorpay");
 const razorPayInstance = new razorPay({
-  key_id: "rzp_test_Nzhd7DrTNJgoYz",
-  key_secret: "utMBllnE0NbzCjY2Q7RbrReJ",
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
 // mail sending
@@ -232,11 +232,11 @@ let nodeMailer = require("nodemailer");
 
 // setup SMTP for nodeMailer
 const Transport = nodeMailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
-  port: 2525,
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
   auth: {
-    user: "d94bddd265db1f",
-    pass: "66bbe0457dbb90",
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
   },
 });
 

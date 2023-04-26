@@ -51,13 +51,23 @@ module.exports = {
             error: "",
           });
         }
+        // Define the color codes
+        const colors = {
+          blue: "#0000ff",
+          green: "#00ff00",
+          red: "#ff0000",
+          purple: "#800080",
+        };
+        const otp = `<span style="color: ${colors.red};">${pickRequest.otp}</span>`;
+
         // call sendMail helper to send mail
-        let sendMailResult = await sails.helpers.mail.sendMail.with({
+        let sendMail = await sails.helpers.mail.sendMail.with({
           mailType: "welcome",
           data: {
             subject: "OTP To Start Ride",
             email: req.me.email,
-            text: `Hello ${req.me.firstName}, \n ${pickRequest.otp} is the OTP to start ride `,
+            // text: `Hello ${req.me.firstName}, \n ${pickRequest.otp} is the OTP to start ride `,
+            html: `<div style="color: blue;">Hello ${req.me.firstName}, \n ${otp} is the OTP to start ride </div>`,
           },
           lang: lang,
         });

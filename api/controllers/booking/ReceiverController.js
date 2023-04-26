@@ -214,12 +214,12 @@ module.exports = {
                   });
 
                   // call sendMail helper to send mail
-                  let sendMailResult = await sails.helpers.mail.sendMail.with({
+                  let sendMail = await sails.helpers.mail.sendMail.with({
                     mailType: "welcome",
                     data: {
                       subject: "OTP To Receive Item",
                       email: updateReceiver.email,
-                      text: `Hello ${updateReceiver.firstName}, \n ${updateReceiver.otp} is the OTP to receive the Item ${pickRequestDetails.bookingId.item}`,
+                      html: `<div style="color: blue;">Hello ${updateReceiver.firstName}, \n ${updateReceiver.otp} is the OTP to receive the Item ${pickRequestDetails.bookingId.item}</div>`,
                     },
                     lang: lang,
                   });
@@ -334,6 +334,24 @@ module.exports = {
                       isReached: true,
                       updatedAt: currentTime,
                       updatedBy: req.me.id,
+                    });
+
+                    // find the sender details
+                    let sender = await User.findOne({
+                      where: {
+                        id: pickRequestDetails.bookingId.bookingBy,
+                        isDeleted: false,
+                      },
+                    });
+                    // call sendMail helper to send mail
+                    let sendMail = await sails.helpers.mail.sendMail.with({
+                      mailType: "welcome",
+                      data: {
+                        subject: "ITEM RECEIVED",
+                        email: sender.email,
+                        html: `<div style="color: blue;">Hello ${sender.firstName}, \n Your Item is received by ${receiverDetails.firstName}</div>`,
+                      },
+                      lang: lang,
                     });
                     //sending OK response
                     return res.ok({

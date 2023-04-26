@@ -31,8 +31,8 @@ module.exports = {
       to: inputs.data.email,
       from: "devdut@gmail.com",
       subject: inputs.data.subject,
-      text: inputs.data.text,
-      // html: mailBody,
+      // text: inputs.data.text,
+      html: inputs.data.html,
     };
     // Sends email asynchronously and capturing the response
     SMTPTransport.sendMail(mailOptions, (err) => {
