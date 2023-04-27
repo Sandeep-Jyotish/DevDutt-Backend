@@ -67,60 +67,60 @@ module.exports = {
             message: GetMessages("User.AlreadyExist", lang),
             error: "",
           });
+        } else {
+          //Check Password and confirm Password are matched or not
+          if (password !== confirmPassword) {
+            //return error
+            return res.badRequest({
+              status: ResponseCodes.BAD_REQUEST,
+              data: {},
+              message: GetMessages("User.PasswordMissMatched", lang),
+              error: "",
+            });
+          } else {
+            // // create RazorPay customer Id for the user
+            // await sails.helpers.razorPay.customer.create.with({});
+            //generating user ID
+            let id = sails.config.constants.UUID();
+            //current time
+            let currentTime = Math.floor(Date.now() / 1000);
+            let dataToStore = {
+              id: id,
+              firstName: firstName,
+              lastName: lastName,
+              picture: picture,
+              phoneNo: phoneNo,
+              email: email,
+              password: password,
+              confirmPassword: confirmPassword,
+              createdBy: id,
+              createdAt: currentTime,
+              updatedAt: currentTime,
+              updatedBy: id,
+            };
+
+            //create the user
+            let user = await User.create(dataToStore).fetch();
+            // call sendMail helper to send mail
+            let sendMail = await sails.helpers.mail.sendMail.with({
+              mailType: "welcome",
+              data: {
+                subject: "WELCOME TO DEVDUT",
+                email: user.email,
+                html: `<div style="color: blue;">Hello ${user.firstName}, become a Devdut for someone to help them And also there is someone who is ready to help you. So take the Advantages from Devdut`,
+                // text: `Hello ${user.firstName}, become a Devdut for someone to help them And also there is someone who is ready to help you. So take the Advantages from Devdut`,
+              },
+              lang: lang,
+            });
+            //send the response
+            return res.ok({
+              status: ResponseCodes.OK,
+              data: user,
+              message: GetMessages("User.Created", lang),
+              error: "",
+            });
+          }
         }
-
-        //Check Password and confirm Password are matched or not
-        if (password !== confirmPassword) {
-          //return error
-          return res.badRequest({
-            status: ResponseCodes.BAD_REQUEST,
-            data: {},
-            message: GetMessages("User.PasswordMissMatched", lang),
-            error: "",
-          });
-        }
-
-        // // create RazorPay customer Id for the user
-        // await sails.helpers.razorPay.customer.create.with({});
-        //generating user ID
-        let id = sails.config.constants.UUID();
-        //current time
-        let currentTime = Math.floor(Date.now() / 1000);
-        let dataToStore = {
-          id: id,
-          firstName: firstName,
-          lastName: lastName,
-          picture: picture,
-          phoneNo: phoneNo,
-          email: email,
-          password: password,
-          confirmPassword: confirmPassword,
-          createdBy: id,
-          createdAt: currentTime,
-          updatedAt: currentTime,
-          updatedBy: id,
-        };
-
-        //create the user
-        let user = await User.create(dataToStore).fetch();
-        // call sendMail helper to send mail
-        let sendMail = await sails.helpers.mail.sendMail.with({
-          mailType: "welcome",
-          data: {
-            subject: "WELCOME TO DEVDUT",
-            email: user.email,
-            html: `<div style="color: blue;">Hello ${user.firstName}, become a Devdut for someone to help them And also there is someone who is ready to help you. So take the Advantages from Devdut`,
-            // text: `Hello ${user.firstName}, become a Devdut for someone to help them And also there is someone who is ready to help you. So take the Advantages from Devdut`,
-          },
-          lang: lang,
-        });
-        //send the response
-        return res.ok({
-          status: ResponseCodes.OK,
-          data: user,
-          message: GetMessages("User.Created", lang),
-          error: "",
-        });
       }
     } catch (error) {
       //return error
